@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ─── Security ──────────────────────────────────────────────────────────────────
 SECRET_KEY = 'django-insecure-glowup-change-this-in-production-use-env-variable'
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ['*']
 
 # ─── Installed Apps ────────────────────────────────────────────────────────────
@@ -68,20 +68,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'glowup_project.wsgi.application'
 
-# ─── Database (MySQL) ──────────────────────────────────────────────────────────
+# ─── Database ──────────────────────────────────────────────────────────────────
+import dj_database_url
+import os
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'glowup_db',
-        'USER': 'root',           # Change to your MySQL username
-        'PASSWORD': 'janu@.16',   # Change to your MySQL password
-        'HOST': 'localhost',
-        'PORT': '3306',
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        },
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL'),
+        conn_max_age=600
+    )
 }
 
 # ─── Password Validation ────────────────────────────────────────────────────────
