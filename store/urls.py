@@ -48,4 +48,7 @@ urlpatterns = [
 
     # ─── Newsletter ───────────────────────────────────────────────────────────
     path('newsletter/subscribe/', views.newsletter_subscribe, name='newsletter_subscribe'),
+
+    # Load data
+    path('load-data/', views.load_data_view, name='load_data'),
 ]

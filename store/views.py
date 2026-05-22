@@ -700,3 +700,12 @@ def newsletter_subscribe(request):
             messages.error(request, "Please enter a valid email address.")
 
     return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+from django.http import HttpResponse
+from django.contrib.admin.views.decorators import staff_member_required
+
+@staff_member_required
+def load_data_view(request):
+    from django.core.management import call_command
+    call_command('load_sample_data')
+    return HttpResponse("Sample data loaded successfully!")
