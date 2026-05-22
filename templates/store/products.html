@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-top" style="padding-bottom:60px;">
+  <div class="container">
+
+    <!-- Page Header -->
+    <div style="padding:40px 0 32px;text-align:center;">
+      <span class="section-subtitle">Our Collection</span>
+      <h1 class="section-title">All Skincare Products</h1>
+      <div class="section-divider">
+        <div class="divider-line"></div>
+        <span class="divider-icon">✦</span>
+        <div class="divider-line right"></div>
+      </div>
+      {% if search_query %}
+      <p style="margin-top:12px;color:var(--text-muted);">
+        Showing results for "<strong style="color:var(--gold);">{{ search_query }}</strong>"
+        — {{ total_count }} product{{ total_count|pluralize }} found
+      </p>
+      {% endif %}
+    </div>
+
+    <div style="display:grid;grid-template-columns:260px 1fr;gap:28px;align-items:start;">
+
+      <!-- ─── Sidebar Filters ──────────────────────────── -->
+      <aside>
+        <div class="filter-panel">
+          <div class="filter-title">
+            <i class="fa fa-sliders-h" style="color:var(--gold);margin-right:8px;"></i>
+            Filter &amp; Sort
+          </div>
+
+          <form method="GET" action="{% url 'products' %}" id="filterForm">
+            <!-- Hidden search query -->
+            {% if search_query %}
+            <input type="hidden" name="q" value="{{ search_query }}" />
+            {% endif %}
+
+            <!-- Sort -->
+            <div class="filter-group">
+              <div class="filter-group-label">Sort By</div>
+              <select name="sort" class="form-control filter-auto-submit" style="font-size:0.85rem;padding:10px 14px;">
+                <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Newest First</option>
+                <option value="price_low" {% if current_sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                <option value="price_high" {% if current_sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                <option value="name_az" {% if current_sort == 'name_az' %}selected{% endif %}>Name: A–Z</option>
+                <option value="name_za" {% if current_sort == 'name_za' %}selected{% endif %}>Name: Z–A</option>
+              </select>
+            </div>
+
+            <!-- Category -->
+            <div class="filter-group">
+              <div class="filter-group-label">Category</div>
+              <label class="filter-option">
+                <input type="radio" name="category" value="" class="filter-auto-submit"
+                  {% if not current_category %}checked{% endif %} />
+                All Categories
+              </label>
+              {% for cat in categories %}
+              <label class="filter-option">
+                <input type="radio" name="category" value="{{ cat.slug }}" class="filter-auto-submit"
+                  {% if current_category == cat.slug %}checked{% endif %} />
+                {{ cat.name }}
+              </label>
+              {% endfor %}
+            </div>
+
+            <!-- Skin Type -->
+            <div class="filter-group">
+              <div class="filter-group-label">Skin Type</div>
+              <label class="filter-option">
+                <input type="radio" name="skin_type" value="" class="filter-auto-submit"
+                  {% if not current_skin_type %}checked{% endif %} />
+                All Types
+              </label>
+              {% for val, label in skin_type_choices %}
+              <label class="filter-option">
+                <input type="radio" name="skin_type" value="{{ val }}" class="filter-auto-submit"
+                  {% if current_skin_type == val %}checked{% endif %} />
+                {{ label }}
+              </label>
+              {% endfor %}
+            </div>
+
+            <!-- Price Range -->
+            <div class="filter-group">
+              <div class="filter-group-label">Price Range</div>
+              <input type="range" name="max_price" class="price-range" min="0" max="5000"
+                     value="{{ request.GET.max_price|default:5000 }}" step="100" />
+              <div class="d-flex justify-between mt-1">
+                <span style="font-size:0.78rem;color:var(--text-muted);">₹0</span>
+                <span class="price-display" style="font-size:0.78rem;color:var(--gold);font-weight:500;">
+                  ₹0 – ₹{{ request.GET.max_price|default:5000 }}
+                </span>
+              </div>
+              <button type="submit" class="btn-glow btn-primary-glow btn-sm" style="width:100%;margin-top:12px;justify-content:center;">
+                Apply Price Filter
+              </button>
+            </div>
+
+            <!-- Reset -->
+            <a href="{% url 'products' %}" class="btn-glow btn-secondary-glow btn-sm" style="width:100%;justify-content:center;text-align:center;">
+              <i class="fa fa-undo"></i> Reset All
+            </a>
+          </form>
+        </div>
+      </aside>
+
+      <!-- ─── Products Grid ─────────────────────────────── -->
+      <div>
+        <!-- Topbar -->
+        <div class="d-flex justify-between align-center flex-wrap gap-2" style="margin-bottom:24px;">
+          <p style="font-size:0.88rem;color:var(--text-muted);">
+            Showing <strong style="color:var(--text-primary);">{{ products.start_index }}–{{ products.end_index }}</strong>
+            of <strong style="color:var(--text-primary);">{{ products.paginator.count }}</strong> products
+          </p>
+          <!-- Quick search -->
+          <form method="GET" action="{% url 'products' %}" style="display:flex;gap:8px;">
+            {% if current_category %}<input type="hidden" name="category" value="{{ current_category }}" />{% endif %}
+            {% if current_skin_type %}<input type="hidden" name="skin_type" value="{{ current_skin_type }}" />{% endif %}
+            <input type="hidden" name="sort" value="{{ current_sort }}" />
+            <input type="text" name="q" value="{{ search_query }}"
+                   placeholder="Search products..."
+                   class="form-control" style="width:220px;padding:8px 16px;" />
+            <button type="submit" class="btn-glow btn-primary-glow btn-sm">
+              <i class="fa fa-search"></i>
+            </button>
+          </form>
+        </div>
+
+        {% if products %}
+        <div class="products-grid">
+          {% for product in products %}
+          {% include 'store/partials/product_card.html' %}
+          {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if products.has_other_pages %}
+        <div class="pagination">
+          {% if products.has_previous %}
+          <a href="?page={{ products.previous_page_number }}&sort={{ current_sort }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_skin_type %}&skin_type={{ current_skin_type }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="page-btn">
+            <i class="fa fa-chevron-left"></i>
+          </a>
+          {% endif %}
+
+          {% for num in products.paginator.page_range %}
+            {% if products.number == num %}
+            <span class="page-btn active">{{ num }}</span>
+            {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+            <a href="?page={{ num }}&sort={{ current_sort }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_skin_type %}&skin_type={{ current_skin_type }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="page-btn">
+              {{ num }}
+            </a>
+            {% endif %}
+          {% endfor %}
+
+          {% if products.has_next %}
+          <a href="?page={{ products.next_page_number }}&sort={{ current_sort }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_skin_type %}&skin_type={{ current_skin_type }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="page-btn">
+            <i class="fa fa-chevron-right"></i>
+          </a>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        {% else %}
+        <!-- Empty state -->
+        <div style="text-align:center;padding:80px 20px;background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);">
+          <div style="font-size:4rem;margin-bottom:16px;">🔍</div>
+          <h3 style="font-family:var(--font-display);font-size:1.5rem;margin-bottom:8px;">No Products Found</h3>
+          <p style="color:var(--text-muted);margin-bottom:24px;">Try adjusting your filters or search terms.</p>
+          <a href="{% url 'products' %}" class="btn-glow btn-primary-glow">Clear All Filters</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  @media (max-width: 768px) {
+    aside { display: none; }
+    .filter-toggle { display: flex !important; }
+  }
+</style>
+{% endblock %}

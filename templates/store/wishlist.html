@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="dashboard-layout">
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-profile">
+        <div class="sidebar-avatar">{{ user.first_name|first|upper|default:user.username|first|upper }}</div>
+        <h3 style="font-family:var(--font-display);font-size:1.1rem;color:var(--text-primary);">{{ user.get_full_name|default:user.username }}</h3>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="{% url 'dashboard' %}" class="sidebar-link"><i class="fa fa-th-large"></i> Dashboard</a>
+        <a href="{% url 'profile_update' %}" class="sidebar-link"><i class="fa fa-user-edit"></i> Edit Profile</a>
+        <a href="{% url 'order_history' %}" class="sidebar-link"><i class="fa fa-shopping-bag"></i> My Orders</a>
+        <a href="{% url 'wishlist' %}" class="sidebar-link active"><i class="fa fa-heart"></i> Wishlist</a>
+        <a href="{% url 'coupons' %}" class="sidebar-link"><i class="fa fa-tag"></i> My Coupons</a>
+        <a href="{% url 'logout' %}" class="sidebar-link" style="color:var(--danger);"><i class="fa fa-sign-out-alt"></i> Logout</a>
+      </nav>
+    </div>
+  </aside>
+  <main>
+    <div style="margin-bottom:20px;"><h2 style="font-family:var(--font-display);font-size:2rem;">My Wishlist 💖</h2><p style="color:var(--text-muted);font-size:0.88rem;">{{ wishlist_products.count }} saved item{{ wishlist_products.count|pluralize }}</p></div>
+    {% if wishlist_products %}
+    <div class="products-grid">
+      {% for product in wishlist_products %}{% include 'store/partials/product_card.html' %}{% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:80px 20px;background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);">
+      <div style="font-size:4rem;margin-bottom:16px;">💔</div>
+      <h3 style="font-family:var(--font-display);font-size:1.6rem;margin-bottom:8px;">Your Wishlist is Empty</h3>
+      <p style="color:var(--text-muted);margin-bottom:24px;">Save products you love by clicking the heart icon.</p>
+      <a href="{% url 'products' %}" class="btn-glow btn-primary-glow">Discover Products</a>
+    </div>
+    {% endif %}
+  </main>
+</div>
+{% endblock %}

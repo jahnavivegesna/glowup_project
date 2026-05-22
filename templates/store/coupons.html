@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="dashboard-layout">
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-profile">
+        <div class="sidebar-avatar">{{ user.first_name|first|upper|default:user.username|first|upper }}</div>
+        <h3 style="font-family:var(--font-display);font-size:1.1rem;color:var(--text-primary);">{{ user.get_full_name|default:user.username }}</h3>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="{% url 'dashboard' %}" class="sidebar-link"><i class="fa fa-th-large"></i> Dashboard</a>
+        <a href="{% url 'profile_update' %}" class="sidebar-link"><i class="fa fa-user-edit"></i> Edit Profile</a>
+        <a href="{% url 'order_history' %}" class="sidebar-link"><i class="fa fa-shopping-bag"></i> My Orders</a>
+        <a href="{% url 'wishlist' %}" class="sidebar-link"><i class="fa fa-heart"></i> Wishlist</a>
+        <a href="{% url 'coupons' %}" class="sidebar-link active"><i class="fa fa-tag"></i> My Coupons</a>
+        <a href="{% url 'logout' %}" class="sidebar-link" style="color:var(--danger);"><i class="fa fa-sign-out-alt"></i> Logout</a>
+      </nav>
+    </div>
+  </aside>
+  <main>
+    <h2 style="font-family:var(--font-display);font-size:2rem;margin-bottom:8px;">My Coupons 🏷️</h2>
+    <p style="color:var(--text-muted);margin-bottom:24px;font-size:0.88rem;">Use these codes at checkout to save on your next order.</p>
+    {% if coupons %}
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;">
+      {% for coupon in coupons %}
+      <div style="background:var(--card-bg);border-radius:var(--card-radius);border:2px dashed var(--gold);overflow:hidden;">
+        <div style="background:linear-gradient(135deg,var(--gold),var(--gold-dark));padding:20px;text-align:center;">
+          <div style="font-family:var(--font-display);font-size:2.5rem;font-weight:600;color:#fff;">
+            {% if coupon.discount_type == 'percent' %}{{ coupon.discount_value|floatformat:0 }}% OFF{% else %}₹{{ coupon.discount_value }} OFF{% endif %}
+          </div>
+        </div>
+        <div style="padding:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div style="font-family:monospace;font-size:1.1rem;font-weight:700;letter-spacing:2px;color:var(--text-primary);background:var(--cream-dark);padding:6px 14px;border-radius:8px;">{{ coupon.code }}</div>
+            <button onclick="navigator.clipboard.writeText('{{ coupon.code }}');this.innerHTML='<i class=\'fa fa-check\'></i> Copied';"
+                    class="btn-glow btn-primary-glow btn-sm">
+              <i class="fa fa-copy"></i> Copy
+            </button>
+          </div>
+          {% if coupon.description %}<p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:8px;">{{ coupon.description }}</p>{% endif %}
+          <div style="font-size:0.78rem;color:var(--text-muted);">
+            {% if coupon.min_order_amount > 0 %}Min. order: ₹{{ coupon.min_order_amount }} &nbsp;|&nbsp; {% endif %}
+            Valid till {{ coupon.valid_until|date:"M d, Y" }}
+          </div>
+          <div style="margin-top:10px;font-size:0.72rem;color:var(--text-muted);">
+            Used {{ coupon.used_count }}/{{ coupon.max_uses }} times
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:80px 20px;background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);">
+      <div style="font-size:4rem;margin-bottom:16px;">🏷️</div>
+      <h3 style="font-family:var(--font-display);font-size:1.6rem;margin-bottom:8px;">No Active Coupons</h3>
+      <p style="color:var(--text-muted);margin-bottom:24px;">Subscribe to our newsletter to get exclusive discount codes!</p>
+      <a href="{% url 'home' %}#newsletter" class="btn-glow btn-primary-glow">Get Coupons</a>
+    </div>
+    {% endif %}
+  </main>
+</div>
+{% endblock %}

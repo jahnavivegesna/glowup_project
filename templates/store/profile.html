@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="dashboard-layout">
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-profile">
+        <div class="sidebar-avatar">
+          {% if user.profile.avatar %}<img src="{{ user.profile.avatar.url }}" alt="">{% else %}{{ user.first_name|first|upper|default:user.username|first|upper }}{% endif %}
+        </div>
+        <h3 style="font-family:var(--font-display);font-size:1.1rem;color:var(--text-primary);">{{ user.get_full_name|default:user.username }}</h3>
+        <p style="font-size:0.78rem;color:var(--text-muted);">{{ user.email }}</p>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="{% url 'dashboard' %}" class="sidebar-link"><i class="fa fa-th-large"></i> Dashboard</a>
+        <a href="{% url 'profile_update' %}" class="sidebar-link active"><i class="fa fa-user-edit"></i> Edit Profile</a>
+        <a href="{% url 'order_history' %}" class="sidebar-link"><i class="fa fa-shopping-bag"></i> My Orders</a>
+        <a href="{% url 'wishlist' %}" class="sidebar-link"><i class="fa fa-heart"></i> Wishlist</a>
+        <a href="{% url 'coupons' %}" class="sidebar-link"><i class="fa fa-tag"></i> My Coupons</a>
+        <a href="{% url 'logout' %}" class="sidebar-link" style="color:var(--danger);"><i class="fa fa-sign-out-alt"></i> Logout</a>
+      </nav>
+    </div>
+  </aside>
+  <main>
+    {% if messages %}{% for message in messages %}<div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">{{ message }}</div>{% endfor %}{% endif %}
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <!-- Personal Info -->
+        <div style="background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);padding:28px;">
+          <h3 style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border);">Personal Information</h3>
+          <div class="form-group"><label class="form-label">First Name</label><input type="text" name="first_name" class="form-control" value="{{ user.first_name }}"></div>
+          <div class="form-group"><label class="form-label">Last Name</label><input type="text" name="last_name" class="form-control" value="{{ user.last_name }}"></div>
+          <div class="form-group"><label class="form-label">Email</label><input type="email" name="email" class="form-control" value="{{ user.email }}"></div>
+          <div class="form-group"><label class="form-label">Phone</label><input type="tel" name="phone" class="form-control" value="{{ user.profile.phone }}"></div>
+          <div class="form-group"><label class="form-label">Date of Birth</label><input type="date" name="date_of_birth" class="form-control" value="{{ user.profile.date_of_birth|date:'Y-m-d'|default:'' }}"></div>
+          <div class="form-group">
+            <label class="form-label">Skin Type</label>
+            <select name="skin_type" class="form-control">
+              <option value="">-- Select --</option>
+              {% for val, label in profile_form.fields.skin_type.choices %}<option value="{{ val }}" {% if user.profile.skin_type == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Profile Photo</label>
+            {% if user.profile.avatar %}<div style="margin-bottom:8px;"><img src="{{ user.profile.avatar.url }}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);"></div>{% endif %}
+            <input type="file" name="avatar" class="form-control" accept="image/*" style="padding:8px;">
+          </div>
+        </div>
+        <!-- Address -->
+        <div style="background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);padding:28px;">
+          <h3 style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border);">Default Shipping Address</h3>
+          <div class="form-group"><label class="form-label">Address Line 1</label><input type="text" name="address_line1" class="form-control" value="{{ user.profile.address_line1 }}" placeholder="House/Flat, Street"></div>
+          <div class="form-group"><label class="form-label">Address Line 2</label><input type="text" name="address_line2" class="form-control" value="{{ user.profile.address_line2 }}" placeholder="Landmark, Area"></div>
+          <div class="form-group"><label class="form-label">City</label><input type="text" name="city" class="form-control" value="{{ user.profile.city }}"></div>
+          <div class="form-group"><label class="form-label">State</label><input type="text" name="state" class="form-control" value="{{ user.profile.state }}"></div>
+          <div class="form-group"><label class="form-label">PIN Code</label><input type="text" name="pincode" class="form-control" value="{{ user.profile.pincode }}" maxlength="6"></div>
+          <div style="padding:16px;background:var(--gold-light);border-radius:10px;font-size:0.82rem;color:var(--gold-dark);">
+            <i class="fa fa-info-circle"></i> This address will be pre-filled during checkout.
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:20px;text-align:right;">
+        <button type="submit" class="btn-glow btn-primary-glow btn-lg"><i class="fa fa-save"></i> Save Changes</button>
+      </div>
+    </form>
+  </main>
+</div>
+{% endblock %}

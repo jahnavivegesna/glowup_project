@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-top" style="padding-bottom:80px;">
+  <div class="container">
+    <div style="max-width:600px;margin:40px auto;text-align:center;">
+
+      <!-- Success Animation -->
+      <div style="width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-dark));margin:0 auto 28px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 16px var(--sage);animation:successPop 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;">
+        <i class="fa fa-check" style="color:#fff;font-size:2.5rem;"></i>
+      </div>
+
+      <h1 style="font-family:var(--font-display);font-size:2.8rem;font-weight:400;margin-bottom:8px;color:var(--text-primary);">
+        Order Confirmed! 🎉
+      </h1>
+      <p style="color:var(--text-muted);font-size:1rem;margin-bottom:28px;">
+        Thank you, <strong style="color:var(--text-primary);">{{ order.full_name }}</strong>! Your skincare essentials are on their way.
+      </p>
+
+      <!-- Order Card -->
+      <div style="background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);padding:28px;text-align:left;margin-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Order ID</div>
+            <div style="font-family:var(--font-display);font-size:1.3rem;font-weight:600;color:var(--text-primary);">#{{ order.order_id }}</div>
+          </div>
+          <span class="order-status status-{{ order.status }}">{{ order.get_status_display }}</span>
+        </div>
+
+        <!-- Order Items -->
+        <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;">
+          {% for item in order.items.all %}
+          <div style="display:flex;gap:12px;align-items:center;">
+            <div style="width:52px;height:52px;border-radius:8px;background:var(--cream-dark);overflow:hidden;flex-shrink:0;">
+              {% if item.product.image %}
+              <img src="{{ item.product.image.url }}" alt="{{ item.product_name }}" style="width:100%;height:100%;object-fit:cover;" />
+              {% else %}
+              <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">🌿</div>
+              {% endif %}
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:0.88rem;font-weight:500;">{{ item.product_name }}</div>
+              <div style="font-size:0.75rem;color:var(--text-muted);">Qty: {{ item.quantity }} × ₹{{ item.product_price }}</div>
+            </div>
+            <div style="font-size:0.9rem;font-weight:500;">₹{{ item.total_price }}</div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Totals -->
+        <div style="border-top:1px solid var(--border);padding-top:16px;">
+          <div style="display:flex;justify-content:space-between;font-size:0.85rem;color:var(--text-secondary);margin-bottom:6px;">
+            <span>Subtotal</span><span>₹{{ order.subtotal }}</span>
+          </div>
+          {% if order.discount_amount > 0 %}
+          <div style="display:flex;justify-content:space-between;font-size:0.85rem;color:var(--green);margin-bottom:6px;">
+            <span>Discount</span><span>−₹{{ order.discount_amount }}</span>
+          </div>
+          {% endif %}
+          <div style="display:flex;justify-content:space-between;font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px;">
+            <span>Shipping</span>
+            <span>{% if order.shipping_charge == 0 %}FREE{% else %}₹{{ order.shipping_charge }}{% endif %}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-family:var(--font-display);font-size:1.3rem;font-weight:600;">
+            <span>Total Paid</span><span style="color:var(--gold);">₹{{ order.total }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shipping Address -->
+      <div style="background:var(--sage);border-radius:var(--card-radius);padding:20px;text-align:left;margin-bottom:28px;">
+        <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--green-dark);font-weight:600;margin-bottom:8px;">
+          <i class="fa fa-map-marker-alt"></i> Delivery Address
+        </div>
+        <div style="font-size:0.88rem;color:var(--text-secondary);line-height:1.7;">
+          {{ order.full_name }}<br>
+          {{ order.address_line1 }}{% if order.address_line2 %}, {{ order.address_line2 }}{% endif %}<br>
+          {{ order.city }}, {{ order.state }} - {{ order.pincode }}<br>
+          📞 {{ order.phone }}
+        </div>
+      </div>
+
+      <!-- Payment Method -->
+      <div style="background:var(--gold-light);border-radius:12px;padding:14px 20px;text-align:center;margin-bottom:28px;font-size:0.88rem;color:var(--gold-dark);">
+        💵 <strong>Cash on Delivery</strong> — Pay ₹{{ order.total }} when your order arrives
+      </div>
+
+      <!-- CTA Buttons -->
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="{% url 'order_history' %}" class="btn-glow btn-secondary-glow">
+          <i class="fa fa-list"></i> My Orders
+        </a>
+        <a href="{% url 'products' %}" class="btn-glow btn-primary-glow">
+          <i class="fa fa-shopping-bag"></i> Continue Shopping
+        </a>
+      </div>
+
+      <p style="font-size:0.78rem;color:var(--text-muted);margin-top:20px;">
+        A confirmation email has been sent to <strong>{{ order.email }}</strong>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+@keyframes successPop {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+</style>
+{% endblock %}

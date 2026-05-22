@@ -1,0 +1,242 @@
+{% load static %}
+<div class="product-card fade-up">
+  <div class="product-badges">
+    {% if product.is_new_arrival %}<span class="badge-pill badge-new">New</span>{% endif %}
+    {% if product.discount_percent > 0 %}<span class="badge-pill badge-sale">{{ product.discount_percent }}% OFF</span>{% endif %}
+    {% if product.is_trending %}<span class="badge-pill badge-trending">🔥 Hot</span>{% endif %}
+  </div>
+  <div class="product-actions">
+    {% if user.is_authenticated %}
+    <a href="{% url 'toggle_wishlist' product.id %}" class="action-btn wishlist-btn" data-url="{% url 'toggle_wishlist' product.id %}" title="Wishlist"><i class="far fa-heart"></i></a>
+    {% endif %}
+    <a href="{% url 'product_detail' product.slug %}" class="action-btn" title="View"><i class="fa fa-eye"></i></a>
+  </div>
+  <a href="{% url 'product_detail' product.slug %}" style="display:block;text-decoration:none;">
+    {% if product.image %}
+    <div style="width:100%;aspect-ratio:1;overflow:hidden;">
+      <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width:100%;height:100%;object-fit:cover;" loading="lazy"/>
+    </div>
+    {% elif product.category.slug == 'moisturizers' %}
+    <div style="width:100%;aspect-ratio:1;background:linear-gradient(160deg,#FFF5E6,#FFD9A0);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+      <div style="position:absolute;width:120px;height:120px;border-radius:50%;background:rgba(255,200,100,0.25);top:-30px;right:-30px;"></div>
+      <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(255,200,100,0.2);bottom:-20px;left:-20px;"></div>
+      <svg viewBox="0 0 160 180" width="70%" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="mg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#E8C97E"/><stop offset="100%" style="stop-color:#A07840"/></linearGradient><linearGradient id="mg2" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#fff;stop-opacity:0.4"/><stop offset="100%" style="stop-color:#C9A96E;stop-opacity:0.1"/></linearGradient></defs>
+        <rect x="30" y="80" width="100" height="80" rx="14" fill="url(#mg1)"/>
+        <rect x="24" y="64" width="112" height="24" rx="10" fill="#F5DFA0"/><rect x="24" y="64" width="112" height="24" rx="10" fill="url(#mg2)"/>
+        <rect x="40" y="92" width="80" height="56" rx="7" fill="rgba(255,255,255,0.88)"/>
+        <text x="80" y="110" text-anchor="middle" font-family="Georgia,serif" font-size="9" fill="#8B6914" font-weight="bold">GLOW UP</text>
+        <text x="80" y="122" text-anchor="middle" font-family="Georgia,serif" font-size="7" fill="#A07830">MOISTURE</text>
+        <text x="80" y="133" text-anchor="middle" font-family="Georgia,serif" font-size="7" fill="#A07830">SURGE</text>
+        <line x1="50" y1="138" x2="110" y2="138" stroke="#C9A96E" stroke-width="1"/>
+        <text x="80" y="146" text-anchor="middle" font-family="Arial" font-size="7" fill="#C9A96E">50ml</text>
+        <ellipse cx="42" cy="120" rx="6" ry="28" fill="rgba(255,255,255,0.12)" transform="rotate(-10,42,120)"/>
+        <text x="80" y="58" font-size="18" text-anchor="middle">🌿</text>
+      </svg>
+      <div style="position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:9px;font-weight:700;color:#8B6914;letter-spacing:1.5px;text-transform:uppercase;">Moisturizer</div>
+    </div>
+    {% elif product.category.slug == 'serums' %}
+    <div style="width:100%;aspect-ratio:1;background:linear-gradient(160deg,#E8F5E8,#B8DFB8);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+      <div style="position:absolute;width:120px;height:120px;border-radius:50%;background:rgba(100,180,100,0.25);top:-30px;right:-30px;"></div>
+      <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(100,180,100,0.2);bottom:-20px;left:-20px;"></div>
+      <svg viewBox="0 0 160 200" width="65%" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="sg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#7BAD7E"/><stop offset="100%" style="stop-color:#4E7D52"/></linearGradient></defs>
+        <rect x="60" y="90" width="40" height="100" rx="10" fill="url(#sg1)"/>
+        <rect x="68" y="60" width="24" height="36" rx="6" fill="#6A9B6D"/>
+        <rect x="56" y="36" width="48" height="30" rx="10" fill="#4E7D52"/>
+        <rect x="78" y="16" width="8" height="24" rx="4" fill="#3D6B40"/>
+        <rect x="63" y="98" width="34" height="75" rx="5" fill="rgba(255,255,255,0.9)"/>
+        <text x="80" y="114" text-anchor="middle" font-family="Georgia,serif" font-size="7" fill="#2D6B2D" font-weight="bold">GLOW UP</text>
+        <text x="80" y="125" text-anchor="middle" font-family="Georgia,serif" font-size="6" fill="#3D7B3D">VIT C</text>
+        <text x="80" y="135" text-anchor="middle" font-family="Georgia,serif" font-size="6" fill="#3D7B3D">SERUM</text>
+        <line x1="68" y1="140" x2="92" y2="140" stroke="#7BAD7E" stroke-width="1"/>
+        <text x="80" y="148" text-anchor="middle" font-family="Arial" font-size="6" fill="#7BAD7E">30ml</text>
+        <ellipse cx="66" cy="130" rx="4" ry="32" fill="rgba(255,255,255,0.12)" transform="rotate(-8,66,130)"/>
+        <text x="80" y="12" font-size="14" text-anchor="middle">✨</text>
+      </svg>
+      <div style="position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:9px;font-weight:700;color:#2D6B2D;letter-spacing:1.5px;text-transform:uppercase;">Serum</div>
+    </div>
+    {% elif product.category.slug == 'cleansers' %}
+    <div style="width:100%;aspect-ratio:1;background:linear-gradient(160deg,#E0F4FF,#A8D8F0);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+      <div style="position:absolute;width:120px;height:120px;border-radius:50%;background:rgba(80,160,220,0.25);top:-30px;right:-30px;"></div>
+      <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(80,160,220,0.2);bottom:-20px;left:-20px;"></div>
+      <svg viewBox="0 0 160 200" width="70%" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="cg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#64A0C8"/><stop offset="100%" style="stop-color:#3A70A0"/></linearGradient></defs>
+        <rect x="40" y="78" width="80" height="106" rx="16" fill="url(#cg1)"/>
+        <path d="M40 94 Q40 78 80 78 Q120 78 120 94 Z" fill="#5A90B8"/>
+        <rect x="66" y="42" width="28" height="44" rx="7" fill="#4A80A8"/>
+        <rect x="50" y="28" width="60" height="22" rx="10" fill="#3A6888"/>
+        <path d="M50 39 L28 52 L28 56 L50 43 Z" fill="#3A6888"/>
+        <rect x="46" y="90" width="68" height="82" rx="6" fill="rgba(255,255,255,0.88)"/>
+        <text x="80" y="108" text-anchor="middle" font-family="Georgia,serif" font-size="7" fill="#1A5C8A" font-weight="bold">GLOW UP</text>
+        <text x="80" y="120" text-anchor="middle" font-family="Georgia,serif" font-size="6" fill="#2A6C9A">MICELLAR</text>
+        <text x="80" y="130" text-anchor="middle" font-family="Georgia,serif" font-size="6" fill="#2A6C9A">CLEANSER</text>
+        <line x1="54" y1="136" x2="106" y2="136" stroke="#64A0C8" stroke-width="1"/>
+        <text x="80" y="144" text-anchor="middle" font-family="Arial" font-size="6" fill="#64A0C8">150ml</text>
+        <circle cx="130" cy="105" r="6" fill="rgba(255,255,255,0.4)"/>
+        <circle cx="138" cy="122" r="4" fill="rgba(255,255,255,0.3)"/>
+        <circle cx="126" cy="133" r="5" fill="rgba(255,255,255,0.35)"/>
+        <ellipse cx="48" cy="122" rx="4" ry="30" fill="rgba(255,255,255,0.12)" transform="rotate(-8,48,122)"/>
+      </svg>
+      <div style="position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:9px;font-weight:700;color:#1A5C8A;letter-spacing:1.5px;text-transform:uppercase;">Cleanser</div>
+    </div>
+    {% elif product.category.slug == 'sunscreen' %}
+    <div style="width:100%;aspect-ratio:1;background:linear-gradient(160deg,#FFFDE0,#FFE860);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+      <div style="position:absolute;width:120px;height:120px;border-radius:50%;background:rgba(255,220,0,0.25);top:-30px;right:-30px;"></div>
+      <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(255,200,0,0.2);bottom:-20px;left:-20px;"></div>
+      <svg viewBox="0 0 160 200" width="70%" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="sug1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#F5D020"/><stop offset="100%" style="stop-color:#C8A800"/></linearGradient></defs>
+        <rect x="48" y="52" width="64" height="130" rx="14" fill="url(#sug1)"/>
+        <rect x="56" y="32" width="48" height="28" rx="10" fill="#A88A00"/>
+        <rect x="48" y="168" width="64" height="14" rx="5" fill="#B89800"/>
+        <rect x="52" y="64" width="56" height="106" rx="6" fill="rgba(255,255,255,0.9)"/>
+        <text x="80" y="82" text-anchor="middle" font-family="Georgia,serif" font-size="7" fill="#8B6A00" font-weight="bold">GLOW UP</text>
+        <text x="80" y="95" text-anchor="middle" font-family="Georgia,serif" font-size="11" fill="#C8A000" font-weight="bold">SPF</text>
+        <text x="80" y="115" text-anchor="middle" font-family="Georgia,serif" font-size="18" fill="#8B6A00" font-weight="bold">50+</text>
+        <text x="80" y="127" text-anchor="middle" font-family="Arial" font-size="6" fill="#A08020">PA++++</text>
+        <line x1="58" y1="133" x2="102" y2="133" stroke="#C8A000" stroke-width="1"/>
+        <text x="80" y="141" text-anchor="middle" font-family="Arial" font-size="6" fill="#C8A000">50ml</text>
+        <circle cx="130" cy="70" r="14" fill="rgba(255,220,0,0.5)"/>
+        <line x1="130" y1="50" x2="130" y2="58" stroke="#FFD700" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="130" y1="82" x2="130" y2="90" stroke="#FFD700" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="110" y1="70" x2="118" y2="70" stroke="#FFD700" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="142" y1="70" x2="150" y2="70" stroke="#FFD700" stroke-width="2.5" stroke-linecap="round"/>
+        <ellipse cx="55" cy="110" rx="4" ry="40" fill="rgba(255,255,255,0.12)" transform="rotate(-5,55,110)"/>
+      </svg>
+      <div style="position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:9px;font-weight:700;color:#8B6A00;letter-spacing:1.5px;text-transform:uppercase;">Sunscreen</div>
+    </div>
+    {% elif product.category.slug == 'eye-care' %}
+    <div style="width:100%;aspect-ratio:1;background:linear-gradient(160deg,#F3E8FF,#D8B4FF);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+      <div style="position:absolute;width:120px;height:120px;border-radius:50%;background:rgba(160,80,220,0.25);top:-30px;right:-30px;"></div>
+      <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(140,60,200,0.2);bottom:-20px;left:-20px;"></div>
+      <svg viewBox="0 0 160 160" width="70%" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="eg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#B090E8"/><stop offset="100%" style="stop-color:#7050B8"/></linearGradient><linearGradient id="eg2" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#fff;stop-opacity:0.4"/><stop offset="100%" style="stop-color:#9060D0;stop-opacity:0.1"/></linearGradient></defs>
+        <rect x="30" y="80" width="100" height="68" rx="16" fill="url(#eg1)"/>
+        <rect x="24" y="62" width="112" height="26" rx="12" fill="#C8A8F8"/><rect x="24" y="62" width="112" height="26" rx="12" fill="url(#eg2)"/>
+        <rect x="38" y="92" width="84" height="48" rx="7" fill="rgba(255,255,255,0.9)"/>
+        <text x="80" y="108" text-anchor="middle" font-family="Georgia,serif" font-size="8" fill="#6B1AAA" font-weight="bold">GLOW UP</text>
+        <text x="80" y="119" text-anchor="middle" font-family="Georgia,serif" font-size="6.5" fill="#7B2ABB">EYE RESCUE</text>
+        <text x="80" y="129" text-anchor="middle" font-family="Georgia,serif" font-size="6.5" fill="#7B2ABB">CREAM</text>
+        <line x1="46" y1="133" x2="114" y2="133" stroke="#B090E8" stroke-width="1"/>
+        <text x="80" y="141" text-anchor="middle" font-family="Arial" font-size="6.5" fill="#B090E8">15ml</text>
+        <ellipse cx="80" cy="50" rx="24" ry="11" fill="none" stroke="#9060D0" stroke-width="2.5"/>
+        <circle cx="80" cy="50" r="6" fill="#9060D0"/>
+        <circle cx="82" cy="48" r="2.5" fill="white"/>
+        <ellipse cx="38" cy="118" rx="5" ry="20" fill="rgba(255,255,255,0.12)" transform="rotate(-10,38,118)"/>
+      </svg>
+      <div style="position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:9px;font-weight:700;color:#6B1AAA;letter-spacing:1.5px;text-transform:uppercase;">Eye Care</div>
+    </div>
+    {% elif product.category.slug == 'face-masks' %}
+    <div style="width:100%;aspect-ratio:1;background:linear-gradient(160deg,#FFE8F0,#FFB8D0);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+      <div style="position:absolute;width:120px;height:120px;border-radius:50%;background:rgba(220,80,120,0.25);top:-30px;right:-30px;"></div>
+      <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(200,60,100,0.2);bottom:-20px;left:-20px;"></div>
+      <svg viewBox="0 0 160 170" width="70%" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="fmg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#E87090"/><stop offset="100%" style="stop-color:#B04060"/></linearGradient><linearGradient id="fmg2" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#fff;stop-opacity:0.4"/><stop offset="100%" style="stop-color:#C06080;stop-opacity:0.1"/></linearGradient></defs>
+        <rect x="26" y="78" width="108" height="80" rx="16" fill="url(#fmg1)"/>
+        <rect x="20" y="58" width="120" height="28" rx="12" fill="#F090A8"/><rect x="20" y="58" width="120" height="28" rx="12" fill="url(#fmg2)"/>
+        <rect x="34" y="90" width="92" height="58" rx="7" fill="rgba(255,255,255,0.9)"/>
+        <text x="80" y="107" text-anchor="middle" font-family="Georgia,serif" font-size="8" fill="#8B1A3A" font-weight="bold">GLOW UP</text>
+        <text x="80" y="118" text-anchor="middle" font-family="Georgia,serif" font-size="6.5" fill="#9B2A4A">KAOLIN CLAY</text>
+        <text x="80" y="128" text-anchor="middle" font-family="Georgia,serif" font-size="6.5" fill="#9B2A4A">DETOX MASK</text>
+        <line x1="42" y1="133" x2="118" y2="133" stroke="#E87090" stroke-width="1"/>
+        <text x="80" y="141" text-anchor="middle" font-family="Arial" font-size="6.5" fill="#E87090">75ml</text>
+        <text x="80" y="50" font-size="18" text-anchor="middle">🌺</text>
+        <ellipse cx="34" cy="122" rx="5" ry="25" fill="rgba(255,255,255,0.12)" transform="rotate(-8,34,122)"/>
+      </svg>
+      <div style="position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:9px;font-weight:700;color:#8B1A3A;letter-spacing:1.5px;text-transform:uppercase;">Face Mask</div>
+    </div>
+    {% elif product.category.slug == 'toners' %}
+    <div style="width:100%;aspect-ratio:1;background:linear-gradient(160deg,#FFE8F8,#FFB8E8);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+      <div style="position:absolute;width:120px;height:120px;border-radius:50%;background:rgba(220,80,180,0.25);top:-30px;right:-30px;"></div>
+      <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(200,60,160,0.2);bottom:-20px;left:-20px;"></div>
+      <svg viewBox="0 0 160 210" width="65%" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="tg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#E880C8"/><stop offset="100%" style="stop-color:#B040A0"/></linearGradient><linearGradient id="tg2" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#fff;stop-opacity:0.35"/><stop offset="100%" style="stop-color:#903080;stop-opacity:0.15"/></linearGradient></defs>
+        <rect x="52" y="60" width="56" height="135" rx="14" fill="url(#tg1)"/>
+        <rect x="56" y="36" width="48" height="30" rx="10" fill="#C060B0"/><rect x="56" y="36" width="48" height="30" rx="10" fill="url(#tg2)"/>
+        <rect x="56" y="72" width="48" height="110" rx="6" fill="rgba(255,255,255,0.9)"/>
+        <text x="80" y="90" text-anchor="middle" font-family="Georgia,serif" font-size="7" fill="#8B1A70" font-weight="bold">GLOW UP</text>
+        <text x="80" y="103" text-anchor="middle" font-family="Georgia,serif" font-size="6.5" fill="#9B2A80">ROSE</text>
+        <text x="80" y="114" text-anchor="middle" font-family="Georgia,serif" font-size="6.5" fill="#9B2A80">WATER</text>
+        <text x="80" y="124" text-anchor="middle" font-family="Georgia,serif" font-size="6.5" fill="#9B2A80">TONER</text>
+        <line x1="62" y1="130" x2="98" y2="130" stroke="#E880C8" stroke-width="1"/>
+        <text x="80" y="139" text-anchor="middle" font-family="Arial" font-size="6.5" fill="#E880C8">200ml</text>
+        <text x="80" y="30" font-size="16" text-anchor="middle">🌹</text>
+        <ellipse cx="60" cy="122" rx="4" ry="40" fill="rgba(255,255,255,0.12)" transform="rotate(-5,60,122)"/>
+      </svg>
+      <div style="position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:9px;font-weight:700;color:#8B1A70;letter-spacing:1.5px;text-transform:uppercase;">Toner</div>
+    </div>
+    {% elif product.category.slug == 'lip-care' %}
+    <div style="width:100%;aspect-ratio:1;background:linear-gradient(160deg,#FFE0EC,#FF90B8);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+      <div style="position:absolute;width:120px;height:120px;border-radius:50%;background:rgba(220,60,100,0.25);top:-30px;right:-30px;"></div>
+      <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(200,40,80,0.2);bottom:-20px;left:-20px;"></div>
+      <svg viewBox="0 0 160 190" width="60%" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#E85080"/><stop offset="100%" style="stop-color:#B02050"/></linearGradient><linearGradient id="lg2" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#fff;stop-opacity:0.35"/><stop offset="100%" style="stop-color:#901030;stop-opacity:0.15"/></linearGradient></defs>
+        <rect x="64" y="82" width="32" height="96" rx="9" fill="url(#lg1)"/>
+        <ellipse cx="80" cy="82" rx="16" ry="7" fill="#F07898"/>
+        <rect x="66" y="58" width="28" height="26" rx="4" fill="#F8A0B8"/>
+        <rect x="58" y="36" width="44" height="26" rx="8" fill="#C04060"/><rect x="58" y="36" width="44" height="26" rx="8" fill="url(#lg2)"/>
+        <rect x="66" y="94" width="28" height="72" rx="5" fill="rgba(255,255,255,0.9)"/>
+        <text x="80" y="110" text-anchor="middle" font-family="Georgia,serif" font-size="7" fill="#8B0A2A" font-weight="bold">GLOW</text>
+        <text x="80" y="120" text-anchor="middle" font-family="Georgia,serif" font-size="7" fill="#8B0A2A" font-weight="bold">UP</text>
+        <text x="80" y="132" text-anchor="middle" font-family="Georgia,serif" font-size="5.5" fill="#9B1A3A">HONEY</text>
+        <text x="80" y="141" text-anchor="middle" font-family="Georgia,serif" font-size="5.5" fill="#9B1A3A">LIP</text>
+        <text x="80" y="150" text-anchor="middle" font-family="Georgia,serif" font-size="5.5" fill="#9B1A3A">BUTTER</text>
+        <line x1="68" y1="155" x2="92" y2="155" stroke="#E85080" stroke-width="1"/>
+        <text x="80" y="162" text-anchor="middle" font-family="Arial" font-size="5.5" fill="#E85080">10g</text>
+        <text x="128" y="115" font-size="18">💋</text>
+        <ellipse cx="68" cy="128" rx="3" ry="30" fill="rgba(255,255,255,0.12)" transform="rotate(-5,68,128)"/>
+      </svg>
+      <div style="position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:9px;font-weight:700;color:#8B0A2A;letter-spacing:1.5px;text-transform:uppercase;">Lip Care</div>
+    </div>
+    {% else %}
+    <div style="width:100%;aspect-ratio:1;background:linear-gradient(160deg,#F5EDD8,#E0C080);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+      <div style="position:absolute;width:120px;height:120px;border-radius:50%;background:rgba(200,160,80,0.25);top:-30px;right:-30px;"></div>
+      <svg viewBox="0 0 160 160" width="70%" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="defg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#C9A96E"/><stop offset="100%" style="stop-color:#8B6B30"/></linearGradient></defs>
+        <rect x="30" y="72" width="100" height="76" rx="16" fill="url(#defg1)"/>
+        <rect x="24" y="54" width="112" height="26" rx="12" fill="#D4B478"/>
+        <rect x="38" y="84" width="84" height="54" rx="7" fill="rgba(255,255,255,0.9)"/>
+        <text x="80" y="102" text-anchor="middle" font-family="Georgia,serif" font-size="8" fill="#6B4A10" font-weight="bold">GLOW UP</text>
+        <text x="80" y="114" text-anchor="middle" font-family="Georgia,serif" font-size="6.5" fill="#7B5A20">SKINCARE</text>
+        <line x1="46" y1="120" x2="114" y2="120" stroke="#C9A96E" stroke-width="1"/>
+        <text x="80" y="128" text-anchor="middle" font-family="Arial" font-size="6.5" fill="#C9A96E">50ml</text>
+        <text x="80" y="48" font-size="16" text-anchor="middle">🌿</text>
+      </svg>
+      <div style="position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:9px;font-weight:700;color:#6B4A10;letter-spacing:1.5px;text-transform:uppercase;">Skincare</div>
+    </div>
+    {% endif %}
+  </a>
+
+  <!-- Product Info -->
+  <div class="product-info">
+    <div class="product-brand">{{ product.brand }}</div>
+    <a href="{% url 'product_detail' product.slug %}"><h3 class="product-name">{{ product.name }}</h3></a>
+    <div class="product-rating">
+      <div class="stars">
+        {% with avg=product.average_rating %}
+        {% if avg >= 1 %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star" style="color:var(--border);"></i>{% endif %}
+        {% if avg >= 2 %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star" style="color:var(--border);"></i>{% endif %}
+        {% if avg >= 3 %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star" style="color:var(--border);"></i>{% endif %}
+        {% if avg >= 4 %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star" style="color:var(--border);"></i>{% endif %}
+        {% if avg >= 5 %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star" style="color:var(--border);"></i>{% endif %}
+        {% endwith %}
+      </div>
+      <span class="rating-count">({{ product.review_count }})</span>
+    </div>
+    <div class="product-price">
+      <span class="price-current">₹{{ product.price }}</span>
+      {% if product.discount_price %}<span class="price-original">₹{{ product.original_price }}</span><span class="price-discount">{{ product.discount_percent }}% off</span>{% endif %}
+    </div>
+  </div>
+
+  <!-- Add to Cart -->
+  <div class="product-card-footer">
+    {% if user.is_authenticated %}
+    <a href="{% url 'add_to_cart' product.id %}" class="btn-add-cart add-to-cart-btn" data-url="{% url 'add_to_cart' product.id %}" data-name="{{ product.name }}">
+      <i class="fa fa-shopping-bag"></i> Add to Cart
+    </a>
+    {% else %}
+    <a href="{% url 'login' %}?next={{ request.path }}" class="btn-add-cart"><i class="fa fa-lock"></i> Login to Buy</a>
+    {% endif %}
+  </div>
+</div>

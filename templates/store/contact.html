@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-top" style="padding-bottom:80px;">
+  <div class="container">
+    <div style="padding:40px 0 32px;text-align:center;">
+      <span class="section-subtitle">We'd Love to Hear From You</span>
+      <h1 class="section-title">Contact Us</h1>
+      <div class="section-divider"><div class="divider-line"></div><span class="divider-icon">✦</span><div class="divider-line right"></div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;">
+      <!-- Contact Info -->
+      <div>
+        <h3 style="font-family:var(--font-display);font-size:1.6rem;margin-bottom:20px;">Get in Touch</h3>
+        <p style="color:var(--text-secondary);line-height:1.8;margin-bottom:28px;">Have a question about a product, need skincare advice, or want to track your order? We're here to help!</p>
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div style="display:flex;gap:16px;align-items:flex-start;padding:20px;background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);">
+            <div style="width:44px;height:44px;border-radius:50%;background:var(--gold-light);display:flex;align-items:center;justify-content:center;color:var(--gold-dark);font-size:1.1rem;flex-shrink:0;">📧</div>
+            <div><div style="font-weight:600;font-size:0.9rem;margin-bottom:4px;">Email Support</div><div style="font-size:0.85rem;color:var(--text-muted);">support@glowup.in</div><div style="font-size:0.78rem;color:var(--text-muted);">Response within 24 hours</div></div>
+          </div>
+          <div style="display:flex;gap:16px;align-items:flex-start;padding:20px;background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);">
+            <div style="width:44px;height:44px;border-radius:50%;background:var(--sage);display:flex;align-items:center;justify-content:center;color:var(--green-dark);font-size:1.1rem;flex-shrink:0;">📞</div>
+            <div><div style="font-weight:600;font-size:0.9rem;margin-bottom:4px;">Phone Support</div><div style="font-size:0.85rem;color:var(--text-muted);">+91 80000 00000</div><div style="font-size:0.78rem;color:var(--text-muted);">Mon–Sat, 9AM–6PM IST</div></div>
+          </div>
+          <div style="display:flex;gap:16px;align-items:flex-start;padding:20px;background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);">
+            <div style="width:44px;height:44px;border-radius:50%;background:var(--blush);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">📍</div>
+            <div><div style="font-weight:600;font-size:0.9rem;margin-bottom:4px;">Head Office</div><div style="font-size:0.85rem;color:var(--text-muted);">Bangalore, Karnataka, India</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Form -->
+      <div style="background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);padding:32px;">
+        <h3 style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:20px;">Send a Message</h3>
+        {% if messages %}{% for message in messages %}<div class="alert alert-{{ message.tags }}">{{ message }}</div>{% endfor %}{% endif %}
+        <form method="POST">
+          {% csrf_token %}
+          <div class="form-group"><label class="form-label">Your Name</label><input type="text" name="name" class="form-control" placeholder="Full Name" required /></div>
+          <div class="form-group"><label class="form-label">Email Address</label><input type="email" name="email" class="form-control" placeholder="you@example.com" required /></div>
+          <div class="form-group"><label class="form-label">Subject</label><input type="text" name="subject" class="form-control" placeholder="What's this about?" required /></div>
+          <div class="form-group"><label class="form-label">Message</label><textarea name="message" class="form-control" rows="5" placeholder="Tell us how we can help..." required></textarea></div>
+          <button type="submit" class="btn-glow btn-primary-glow" style="width:100%;justify-content:center;"><i class="fa fa-paper-plane"></i> Send Message</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

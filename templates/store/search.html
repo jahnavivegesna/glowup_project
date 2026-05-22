@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-top" style="padding-bottom:80px;">
+  <div class="container">
+    <div style="padding:32px 0 24px;">
+      <h1 style="font-family:var(--font-display);font-size:2.2rem;">Search Results</h1>
+      {% if query %}<p style="color:var(--text-muted);margin-top:8px;">{{ products.count }} result{{ products.count|pluralize }} for "<strong style="color:var(--text-primary);">{{ query }}</strong>"</p>{% endif %}
+    </div>
+    <!-- Search form -->
+    <form method="GET" action="{% url 'search' %}" style="margin-bottom:36px;">
+      <div style="display:flex;gap:12px;max-width:600px;">
+        <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search skincare products..." style="flex:1;" autofocus>
+        <button type="submit" class="btn-glow btn-primary-glow"><i class="fa fa-search"></i> Search</button>
+      </div>
+    </form>
+    {% if products %}
+    <div class="products-grid">
+      {% for product in products %}{% include 'store/partials/product_card.html' %}{% endfor %}
+    </div>
+    {% elif query %}
+    <div style="text-align:center;padding:80px 20px;background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);">
+      <div style="font-size:3rem;margin-bottom:16px;">🔍</div>
+      <h3 style="font-family:var(--font-display);font-size:1.5rem;margin-bottom:8px;">No Results Found</h3>
+      <p style="color:var(--text-muted);margin-bottom:20px;">Try different keywords or browse our collections.</p>
+      <a href="{% url 'products' %}" class="btn-glow btn-primary-glow">Browse All Products</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

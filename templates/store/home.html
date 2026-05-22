@@ -1,0 +1,408 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- ─── Hero Section ──────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-pattern"></div>
+  <div class="hero-content">
+    <div class="hero-text">
+      <span class="hero-eyebrow">✦ Naturally Radiant</span>
+      <h1 class="hero-title">
+        Your Skin<br>Deserves to
+        <span><em>Glow</em></span>
+      </h1>
+      <p class="hero-desc">
+        Discover luxury skincare crafted with the finest botanical ingredients. Science-backed formulas that transform your skin from within.
+      </p>
+      <div class="hero-cta">
+        <a href="{% url 'products' %}" class="btn-glow btn-primary-glow btn-lg">
+          Shop Now
+        </a>
+        <a href="{% url 'about' %}" class="btn-glow btn-secondary-glow btn-lg">
+          Our Story
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-number">10K+</span>
+          <span class="stat-label">Happy Customers</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">200+</span>
+          <span class="stat-label">Products</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">100%</span>
+          <span class="stat-label">Natural</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hero-image-main">
+        <div style="width:100%;aspect-ratio:1;background:linear-gradient(135deg,var(--gold-light),var(--sage),var(--green-light));display:flex;align-items:center;justify-content:center;">
+          <div style="text-align:center;">
+            <div style="font-size:5rem;">🌿</div>
+            <p style="font-family:var(--font-display);font-size:1.2rem;color:var(--text-secondary);margin-top:12px;">Pure Botanical<br>Skincare</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-badge hero-badge-1">
+        <div class="badge-inner">
+          <div class="badge-icon gold">⭐</div>
+          <div>
+            <div class="badge-value">4.9/5.0</div>
+            <div class="badge-text">Customer Rating</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-badge hero-badge-2">
+        <div class="badge-inner">
+          <div class="badge-icon green">🌱</div>
+          <div>
+            <div class="badge-value">Cruelty Free</div>
+            <div class="badge-text">Vegan &amp; Ethical</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Categories ───────────────────────────────────────────── -->
+<section style="padding:48px 0;background:var(--cream-dark);">
+  <div class="container">
+    <div class="section-header fade-up">
+      <span class="section-subtitle">Browse By</span>
+      <h2 class="section-title">Shop by Category</h2>
+      <div class="section-divider">
+        <div class="divider-line"></div>
+        <span class="divider-icon">✦</span>
+        <div class="divider-line right"></div>
+      </div>
+    </div>
+
+    <div class="categories-grid">
+      {% if categories %}
+        {% for category in categories %}
+        <a href="{% url 'products_by_category' category.slug %}" class="category-card fade-up">
+          <div class="category-icon" style="background:var(--gold-light);">
+            {% if category.image %}
+              <img src="{{ category.image.url }}" alt="{{ category.name }}" style="width:40px;height:40px;object-fit:cover;border-radius:50%;">
+            {% else %}
+              🌸
+            {% endif %}
+          </div>
+          <div class="category-name">{{ category.name }}</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">{{ category.products.count }} Products</div>
+        </a>
+        {% endfor %}
+      {% else %}
+        <a href="{% url 'products' %}?category=moisturizers" class="category-card fade-up">
+          <div class="category-icon">🧴</div>
+          <div class="category-name">Moisturizers</div>
+        </a>
+        <a href="{% url 'products' %}?category=cleansers" class="category-card fade-up fade-up-delay-1">
+          <div class="category-icon">🧼</div>
+          <div class="category-name">Cleansers</div>
+        </a>
+        <a href="{% url 'products' %}?category=serums" class="category-card fade-up fade-up-delay-2">
+          <div class="category-icon">💧</div>
+          <div class="category-name">Serums</div>
+        </a>
+        <a href="{% url 'products' %}?category=sunscreen" class="category-card fade-up fade-up-delay-3">
+          <div class="category-icon">☀️</div>
+          <div class="category-name">Sunscreen</div>
+        </a>
+        <a href="{% url 'products' %}?category=eye-care" class="category-card fade-up fade-up-delay-4">
+          <div class="category-icon">👁️</div>
+          <div class="category-name">Eye Care</div>
+        </a>
+        <a href="{% url 'products' %}" class="category-card fade-up">
+          <div class="category-icon" style="background:var(--green-light);">✨</div>
+          <div class="category-name">All Products</div>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- ─── Featured Products ─────────────────────────────────────── -->
+<section>
+  <div class="container">
+    <div class="section-header fade-up">
+      <span class="section-subtitle">Curated for You</span>
+      <h2 class="section-title">Featured Products</h2>
+      <div class="section-divider">
+        <div class="divider-line"></div>
+        <span class="divider-icon">✦</span>
+        <div class="divider-line right"></div>
+      </div>
+      <p style="color:var(--text-muted);max-width:500px;margin:12px auto 0;font-size:0.92rem;">
+        Hand-picked formulations our experts swear by for visible, lasting results.
+      </p>
+    </div>
+
+    {% if featured_products %}
+    <div class="products-grid">
+      {% for product in featured_products %}
+      {% include 'store/partials/product_card.html' %}
+      {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:60px 0;color:var(--text-muted);">
+      <div style="font-size:3rem;margin-bottom:16px;">🌿</div>
+      <p>Products coming soon. <a href="/admin/" style="color:var(--gold);">Add products in admin →</a></p>
+    </div>
+    {% endif %}
+
+    <div style="text-align:center;margin-top:40px;">
+      <a href="{% url 'products' %}" class="btn-glow btn-secondary-glow">
+        View All Products →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Offers Banner ─────────────────────────────────────────── -->
+{% if offers %}
+<section style="background:var(--cream-dark);padding:60px 0;">
+  <div class="container">
+    <div class="section-header fade-up">
+      <span class="section-subtitle">Limited Time</span>
+      <h2 class="section-title">Hot Offers</h2>
+      <div class="section-divider">
+        <div class="divider-line"></div>
+        <span class="divider-icon">✦</span>
+        <div class="divider-line right"></div>
+      </div>
+    </div>
+
+    <div class="offers-grid">
+      {% for offer in offers %}
+      <a href="{{ offer.url|default:'#' }}" class="offer-card fade-up">
+        <div class="offer-card-bg"></div>
+        {% if offer.image %}
+        <img src="{{ offer.image.url }}" alt="{{ offer.title }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.3;">
+        {% endif %}
+        <div class="offer-content">
+          <div class="offer-discount">{{ offer.discount_percent }}% OFF</div>
+          <div class="offer-title">{{ offer.title }}</div>
+          <span class="btn-glow btn-sm" style="background:rgba(255,255,255,0.2);color:#fff;border:1px solid rgba(255,255,255,0.4);">
+            Shop Now →
+          </span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── New Arrivals ──────────────────────────────────────────── -->
+<section>
+  <div class="container">
+    <div class="section-header fade-up">
+      <span class="section-subtitle">Just Landed</span>
+      <h2 class="section-title">New Arrivals</h2>
+      <div class="section-divider">
+        <div class="divider-line"></div>
+        <span class="divider-icon">✦</span>
+        <div class="divider-line right"></div>
+      </div>
+    </div>
+
+    {% if new_arrivals %}
+    <div class="products-grid">
+      {% for product in new_arrivals %}
+      {% include 'store/partials/product_card.html' %}
+      {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:40px 0;color:var(--text-muted);">
+      <p>New arrivals coming soon! <a href="{% url 'products' %}" style="color:var(--gold);">Browse all products →</a></p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- ─── Trending Carousel ─────────────────────────────────────── -->
+{% if trending %}
+<section style="background:var(--cream-dark);padding:60px 0;overflow:hidden;">
+  <div class="container">
+    <div class="section-header fade-up">
+      <span class="section-subtitle">What's Hot</span>
+      <h2 class="section-title">Trending Now 🔥</h2>
+    </div>
+  </div>
+  <div class="trending-carousel" style="display:flex;gap:24px;overflow-x:auto;padding:0 24px 24px;scrollbar-width:none;">
+    {% for product in trending %}
+    <div style="min-width:240px;max-width:240px;">
+      {% include 'store/partials/product_card.html' %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── Why Choose Us ─────────────────────────────────────────── -->
+<section>
+  <div class="container">
+    <div class="section-header fade-up">
+      <span class="section-subtitle">The GLOW UP Difference</span>
+      <h2 class="section-title">Why Skin Loves Us</h2>
+      <div class="section-divider">
+        <div class="divider-line"></div>
+        <span class="divider-icon">✦</span>
+        <div class="divider-line right"></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:32px;">
+      <div class="fade-up" style="text-align:center;padding:32px 20px;background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);">
+        <div style="font-size:2.5rem;margin-bottom:16px;">🌿</div>
+        <h3 style="font-family:var(--font-display);font-size:1.15rem;margin-bottom:10px;">100% Natural</h3>
+        <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.6;">Formulated with pure botanical extracts. No parabens, sulfates, or harmful chemicals.</p>
+      </div>
+      <div class="fade-up fade-up-delay-1" style="text-align:center;padding:32px 20px;background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);">
+        <div style="font-size:2.5rem;margin-bottom:16px;">🔬</div>
+        <h3 style="font-family:var(--font-display);font-size:1.15rem;margin-bottom:10px;">Dermatologist Tested</h3>
+        <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.6;">Every product is clinically tested and approved by certified dermatologists.</p>
+      </div>
+      <div class="fade-up fade-up-delay-2" style="text-align:center;padding:32px 20px;background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);">
+        <div style="font-size:2.5rem;margin-bottom:16px;">🚚</div>
+        <h3 style="font-family:var(--font-display);font-size:1.15rem;margin-bottom:10px;">Free Shipping</h3>
+        <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.6;">Free delivery on all orders above ₹499. Express delivery available.</p>
+      </div>
+      <div class="fade-up fade-up-delay-3" style="text-align:center;padding:32px 20px;background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);">
+        <div style="font-size:2.5rem;margin-bottom:16px;">♻️</div>
+        <h3 style="font-family:var(--font-display);font-size:1.15rem;margin-bottom:10px;">Sustainable</h3>
+        <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.6;">Eco-friendly packaging made from recycled materials. Kind to your skin and the planet.</p>
+      </div>
+      <div class="fade-up fade-up-delay-4" style="text-align:center;padding:32px 20px;background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);">
+        <div style="font-size:2.5rem;margin-bottom:16px;">💯</div>
+        <h3 style="font-family:var(--font-display);font-size:1.15rem;margin-bottom:10px;">Money-Back Guarantee</h3>
+        <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.6;">Not satisfied? Get a full refund within 30 days, no questions asked.</p>
+      </div>
+      <div class="fade-up" style="text-align:center;padding:32px 20px;background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);">
+        <div style="font-size:2.5rem;margin-bottom:16px;">🎁</div>
+        <h3 style="font-family:var(--font-display);font-size:1.15rem;margin-bottom:10px;">Loyalty Rewards</h3>
+        <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.6;">Earn GLOW points on every purchase and redeem for exclusive discounts.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Customer Reviews ──────────────────────────────────────── -->
+<section style="background:var(--cream-dark);padding:80px 0;">
+  <div class="container">
+    <div class="section-header fade-up">
+      <span class="section-subtitle">Real Results</span>
+      <h2 class="section-title">What Our Customers Say</h2>
+      <div class="section-divider">
+        <div class="divider-line"></div>
+        <span class="divider-icon">✦</span>
+        <div class="divider-line right"></div>
+      </div>
+    </div>
+
+    {% if reviews %}
+    <div class="reviews-grid">
+      {% for review in reviews %}
+      <div class="review-card fade-up">
+        <div class="stars" style="margin-bottom:12px;">
+          {% if review.rating >= 1 %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}
+          {% if review.rating >= 2 %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}
+          {% if review.rating >= 3 %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}
+          {% if review.rating >= 4 %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}
+          {% if review.rating >= 5 %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}
+        </div>
+        {% if review.title %}
+        <h4 style="font-family:var(--font-display);font-size:1rem;margin-bottom:8px;">{{ review.title }}</h4>
+        {% endif %}
+        <p class="review-text">"{{ review.body|truncatewords:30 }}"</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">{{ review.user.first_name|first|upper }}</div>
+          <div>
+            <div class="reviewer-name">{{ review.user.get_full_name|default:review.user.username }}</div>
+            <div class="reviewer-product">{{ review.product.name|truncatewords:4 }}</div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="reviews-grid">
+      <div class="review-card fade-up">
+        <div class="stars" style="margin-bottom:12px;">
+          <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+        </div>
+        <p class="review-text">"This serum transformed my skin in just 2 weeks! My dark spots have faded significantly and my skin glows like never before."</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">P</div>
+          <div>
+            <div class="reviewer-name">Priya S.</div>
+            <div class="reviewer-product">Vitamin C Brightening Serum</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card fade-up fade-up-delay-1">
+        <div class="stars" style="margin-bottom:12px;">
+          <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+        </div>
+        <p class="review-text">"Absolutely love the moisturizer. It's lightweight yet deeply hydrating. Perfect for my combination skin."</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">A</div>
+          <div>
+            <div class="reviewer-name">Ananya R.</div>
+            <div class="reviewer-product">Hyaluronic Acid Moisture Surge</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card fade-up fade-up-delay-2">
+        <div class="stars" style="margin-bottom:12px;">
+          <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i>
+        </div>
+        <p class="review-text">"The sunscreen doesn't leave a white cast at all! Finally found my holy grail SPF. Repurchasing forever."</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">S</div>
+          <div>
+            <div class="reviewer-name">Shreya M.</div>
+            <div class="reviewer-product">SPF 50+ Invisible Sunscreen</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- ─── Newsletter Section ────────────────────────────────────── -->
+<section>
+  <div class="container">
+    <div class="newsletter-section fade-up">
+      <span class="section-subtitle">Stay in the Loop</span>
+      <h2 class="section-title">Get Exclusive Offers</h2>
+      <p style="color:var(--text-secondary);max-width:460px;margin:12px auto 0;font-size:0.92rem;">
+        Subscribe to our newsletter and be the first to know about new launches, skincare tips, and members-only discounts.
+      </p>
+      <form class="newsletter-form" action="{% url 'newsletter_subscribe' %}" method="POST">
+        {% csrf_token %}
+        <input type="email" name="email" class="newsletter-input" placeholder="Enter your email address" required />
+        <button type="submit" class="btn-glow btn-primary-glow">
+          Subscribe →
+        </button>
+      </form>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin-top:12px;">
+        🔒 No spam, ever. Unsubscribe anytime.
+      </p>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

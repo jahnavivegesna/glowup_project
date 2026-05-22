@@ -1,0 +1,364 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-top" style="padding-bottom:80px;">
+  <div class="container">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb" style="padding-top:20px;">
+      <a href="{% url 'home' %}">Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="{% url 'products' %}">Products</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="{% url 'products_by_category' product.category.slug %}">{{ product.category.name }}</a>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-current">{{ product.name|truncatechars:40 }}</span>
+    </div>
+
+    <!-- ─── Product Detail Grid ─────────────────────────────── -->
+    <div class="product-detail-grid">
+
+      <!-- Left: Gallery -->
+      <div class="product-gallery">
+        <div class="gallery-main">
+          {% if product.image %}
+          <img src="{{ product.image.url }}" alt="{{ product.name }}" id="mainImage" />
+          {% else %}
+          <div style="width:100%;height:100%;background:linear-gradient(135deg,var(--gold-light),var(--sage));display:flex;align-items:center;justify-content:center;aspect-ratio:1;">
+            <span style="font-size:5rem;">🌿</span>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Thumbnails -->
+        {% if product.image or product.image2 or product.image3 %}
+        <div class="gallery-thumbs">
+          {% if product.image %}
+          <div class="gallery-thumb active">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" />
+          </div>
+          {% endif %}
+          {% if product.image2 %}
+          <div class="gallery-thumb">
+            <img src="{{ product.image2.url }}" alt="{{ product.name }} - view 2" />
+          </div>
+          {% endif %}
+          {% if product.image3 %}
+          <div class="gallery-thumb">
+            <img src="{{ product.image3.url }}" alt="{{ product.name }} - view 3" />
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Right: Info -->
+      <div class="product-info-panel">
+        <!-- Brand & Category -->
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+          <span style="font-size:0.75rem;text-transform:uppercase;letter-spacing:2px;color:var(--gold);font-weight:600;">{{ product.brand }}</span>
+          <span style="width:4px;height:4px;border-radius:50%;background:var(--border);display:inline-block;"></span>
+          <a href="{% url 'products_by_category' product.category.slug %}" style="font-size:0.75rem;color:var(--text-muted);">{{ product.category.name }}</a>
+        </div>
+
+        <!-- Name -->
+        <h1 style="font-family:var(--font-display);font-size:clamp(1.6rem,3vw,2.4rem);font-weight:400;color:var(--text-primary);line-height:1.2;margin-bottom:16px;">
+          {{ product.name }}
+        </h1>
+
+        <!-- Rating -->
+        <div class="d-flex align-center gap-2 mb-3">
+          <div class="stars" style="font-size:1rem;">
+            {% with avg=product.average_rating %}
+            {% for i in "12345" %}
+              {% if forloop.counter <= avg %}
+                <i class="fas fa-star"></i>
+              {% else %}
+                <i class="far fa-star" style="color:var(--border);"></i>
+              {% endif %}
+            {% endfor %}
+            {% endwith %}
+          </div>
+          <span style="font-size:0.88rem;color:var(--text-muted);">{{ product.average_rating }}/5 ({{ product.review_count }} reviews)</span>
+          {% if product.is_trending %}
+          <span class="badge-pill badge-trending" style="font-size:0.72rem;">🔥 Trending</span>
+          {% endif %}
+        </div>
+
+        <!-- Price -->
+        <div class="product-price mb-4" style="font-size:1.1rem;">
+          <span class="price-current" style="font-size:2rem;">₹{{ product.price }}</span>
+          {% if product.discount_price %}
+          <span class="price-original" style="font-size:1.1rem;">₹{{ product.original_price }}</span>
+          <span class="price-discount">{{ product.discount_percent }}% off</span>
+          {% endif %}
+        </div>
+
+        <!-- Stock Status -->
+        <div class="mb-3">
+          {% if product.stock > 10 %}
+          <span style="color:var(--green);font-size:0.85rem;font-weight:500;"><i class="fa fa-check-circle"></i> In Stock ({{ product.stock }} available)</span>
+          {% elif product.stock > 0 %}
+          <span style="color:var(--warning);font-size:0.85rem;font-weight:500;"><i class="fa fa-exclamation-circle"></i> Only {{ product.stock }} left — hurry!</span>
+          {% else %}
+          <span style="color:var(--danger);font-size:0.85rem;font-weight:500;"><i class="fa fa-times-circle"></i> Out of Stock</span>
+          {% endif %}
+        </div>
+
+        <!-- Skin Type -->
+        {% if product.skin_type %}
+        <div class="mb-3">
+          <span style="font-size:0.82rem;color:var(--text-muted);">Best for:</span>
+          <span style="font-size:0.82rem;font-weight:500;color:var(--text-primary);margin-left:6px;">{{ product.get_skin_type_display }}</span>
+        </div>
+        {% endif %}
+
+        {% if product.weight %}
+        <div class="mb-4">
+          <span style="font-size:0.82rem;color:var(--text-muted);">Size:</span>
+          <span style="font-size:0.82rem;font-weight:500;color:var(--text-primary);margin-left:6px;">{{ product.weight }}</span>
+        </div>
+        {% endif %}
+
+        <!-- Actions -->
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+          {% if user.is_authenticated and product.stock > 0 %}
+          <a href="{% url 'add_to_cart' product.id %}"
+             class="btn-glow btn-primary-glow btn-lg add-to-cart-btn"
+             data-url="{% url 'add_to_cart' product.id %}"
+             data-name="{{ product.name }}"
+             style="flex:1;">
+            <i class="fa fa-shopping-bag"></i> Add to Cart
+          </a>
+          <a href="{% url 'toggle_wishlist' product.id %}"
+             class="btn-icon wishlist-btn {% if in_wishlist %}wishlisted{% endif %}"
+             data-url="{% url 'toggle_wishlist' product.id %}"
+             style="width:52px;height:52px;background:var(--card-bg);border:2px solid {% if in_wishlist %}#E07070{% else %}var(--border){% endif %};"
+             title="{% if in_wishlist %}Remove from Wishlist{% else %}Add to Wishlist{% endif %}">
+            <i class="{% if in_wishlist %}fas{% else %}far{% endif %} fa-heart" style="color:{% if in_wishlist %}#E07070{% else %}var(--text-muted){% endif %};"></i>
+          </a>
+          {% elif not user.is_authenticated %}
+          <a href="{% url 'login' %}?next={{ request.path }}" class="btn-glow btn-primary-glow btn-lg" style="flex:1;">
+            <i class="fa fa-lock"></i> Login to Buy
+          </a>
+          {% else %}
+          <button class="btn-glow btn-secondary-glow btn-lg" disabled style="flex:1;opacity:0.6;cursor:not-allowed;">
+            Out of Stock
+          </button>
+          {% endif %}
+        </div>
+
+        <!-- Trust Signals -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px;">
+          <div style="display:flex;align-items:center;gap:8px;padding:12px;background:var(--sage);border-radius:12px;">
+            <span style="font-size:1.2rem;">🚚</span>
+            <div>
+              <div style="font-size:0.78rem;font-weight:600;color:var(--text-primary);">Free Shipping</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);">On orders above ₹499</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:12px;background:var(--gold-light);border-radius:12px;">
+            <span style="font-size:1.2rem;">↩️</span>
+            <div>
+              <div style="font-size:0.78rem;font-weight:600;color:var(--text-primary);">Easy Returns</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);">30-day return policy</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:12px;background:var(--blush);border-radius:12px;">
+            <span style="font-size:1.2rem;">✅</span>
+            <div>
+              <div style="font-size:0.78rem;font-weight:600;color:var(--text-primary);">Dermatologist Tested</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);">Clinically approved</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:12px;background:var(--cream-dark);border-radius:12px;">
+            <span style="font-size:1.2rem;">💳</span>
+            <div>
+              <div style="font-size:0.78rem;font-weight:600;color:var(--text-primary);">Cash on Delivery</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);">Pay when it arrives</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description Accordion -->
+        <div style="border:1px solid var(--border);border-radius:var(--card-radius);overflow:hidden;">
+          <!-- Description -->
+          <details open style="border-bottom:1px solid var(--border);">
+            <summary style="padding:16px 20px;cursor:pointer;font-family:var(--font-display);font-size:1rem;font-weight:500;list-style:none;display:flex;justify-content:space-between;align-items:center;background:var(--card-bg);">
+              Description <i class="fa fa-chevron-down" style="font-size:0.75rem;color:var(--text-muted);transition:var(--transition);"></i>
+            </summary>
+            <div style="padding:16px 20px;font-size:0.88rem;color:var(--text-secondary);line-height:1.8;background:var(--cream-dark);">
+              {{ product.description }}
+            </div>
+          </details>
+
+          <!-- Ingredients -->
+          {% if product.ingredients %}
+          <details style="border-bottom:1px solid var(--border);">
+            <summary style="padding:16px 20px;cursor:pointer;font-family:var(--font-display);font-size:1rem;font-weight:500;list-style:none;display:flex;justify-content:space-between;align-items:center;background:var(--card-bg);">
+              Ingredients <i class="fa fa-chevron-down" style="font-size:0.75rem;color:var(--text-muted);"></i>
+            </summary>
+            <div style="padding:16px 20px;font-size:0.85rem;color:var(--text-secondary);line-height:1.8;background:var(--cream-dark);">
+              {{ product.ingredients }}
+            </div>
+          </details>
+          {% endif %}
+
+          <!-- How to Use -->
+          {% if product.how_to_use %}
+          <details>
+            <summary style="padding:16px 20px;cursor:pointer;font-family:var(--font-display);font-size:1rem;font-weight:500;list-style:none;display:flex;justify-content:space-between;align-items:center;background:var(--card-bg);">
+              How to Use <i class="fa fa-chevron-down" style="font-size:0.75rem;color:var(--text-muted);"></i>
+            </summary>
+            <div style="padding:16px 20px;font-size:0.85rem;color:var(--text-secondary);line-height:1.8;background:var(--cream-dark);">
+              {{ product.how_to_use }}
+            </div>
+          </details>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Reviews Section ─────────────────────────────────── -->
+    <div style="margin-top:60px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;" class="reviews-layout">
+
+        <!-- Review List -->
+        <div>
+          <h2 style="font-family:var(--font-display);font-size:1.8rem;margin-bottom:24px;">
+            Customer Reviews
+            <span style="font-size:1rem;color:var(--text-muted);font-weight:400;">({{ product.review_count }})</span>
+          </h2>
+
+          {% if reviews %}
+          <div style="display:flex;flex-direction:column;gap:20px;">
+            {% for review in reviews %}
+            <div style="background:var(--card-bg);border-radius:var(--card-radius);padding:24px;border:1px solid var(--border);">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div class="reviewer-avatar">
+                    {% if review.user.profile.avatar %}
+                      <img src="{{ review.user.profile.avatar.url }}" alt="{{ review.user.get_full_name }}">
+                    {% else %}
+                      {{ review.user.first_name|first|default:review.user.username|first|upper }}
+                    {% endif %}
+                  </div>
+                  <div>
+                    <div style="font-weight:500;font-size:0.9rem;">{{ review.user.get_full_name|default:review.user.username }}</div>
+                    <div style="font-size:0.75rem;color:var(--text-muted);">{{ review.created_at|date:"M d, Y" }}</div>
+                  </div>
+                </div>
+                <div class="stars" style="font-size:0.85rem;">
+                  {% for i in "12345" %}
+                    {% if forloop.counter <= review.rating %}
+                      <i class="fas fa-star"></i>
+                    {% else %}
+                      <i class="far fa-star" style="color:var(--border);"></i>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+              {% if review.title %}
+              <h4 style="font-size:0.95rem;font-weight:500;margin-bottom:8px;">{{ review.title }}</h4>
+              {% endif %}
+              <p style="font-size:0.88rem;color:var(--text-secondary);line-height:1.7;">{{ review.body }}</p>
+              {% if review.is_verified %}
+              <div style="margin-top:10px;font-size:0.72rem;color:var(--green);font-weight:500;">
+                <i class="fa fa-check-circle"></i> Verified Purchase
+              </div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div style="text-align:center;padding:40px;background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);">
+            <div style="font-size:2.5rem;margin-bottom:12px;">💬</div>
+            <p style="color:var(--text-muted);">No reviews yet. Be the first to share your experience!</p>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Write Review -->
+        <div>
+          <div style="background:var(--card-bg);border-radius:var(--card-radius);padding:32px;border:1px solid var(--border);position:sticky;top:88px;">
+            <h3 style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:20px;">Write a Review</h3>
+
+            {% if user.is_authenticated %}
+              {% if user_review %}
+              <div class="alert alert-success">
+                <i class="fa fa-check-circle"></i>
+                You've already reviewed this product. Thank you!
+              </div>
+              {% else %}
+              <form method="POST" action="{% url 'add_review' product.slug %}">
+                {% csrf_token %}
+
+                <!-- Star Rating -->
+                <div class="form-group">
+                  <label class="form-label">Your Rating *</label>
+                  <div class="star-rating-input">
+                    {% for i in "54321" %}
+                    <input type="radio" name="rating" id="star{{ i }}" value="{{ i }}" required>
+                    <label for="star{{ i }}" title="{{ i }} stars"><i class="fas fa-star"></i></label>
+                    {% endfor %}
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="review-title">Review Title</label>
+                  <input type="text" name="title" id="review-title" class="form-control" placeholder="Summarize your experience..." maxlength="200">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="review-body">Your Review *</label>
+                  <textarea name="body" id="review-body" class="form-control" rows="5" placeholder="Share the details of your experience with this product..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn-glow btn-primary-glow" style="width:100%;justify-content:center;">
+                  <i class="fa fa-paper-plane"></i> Submit Review
+                </button>
+              </form>
+              {% endif %}
+            {% else %}
+            <div style="text-align:center;padding:20px 0;">
+              <p style="color:var(--text-muted);margin-bottom:16px;">Please log in to write a review.</p>
+              <a href="{% url 'login' %}?next={{ request.path }}" class="btn-glow btn-primary-glow">
+                <i class="fa fa-sign-in-alt"></i> Login to Review
+              </a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Related Products ────────────────────────────────── -->
+    {% if related_products %}
+    <div style="margin-top:60px;">
+      <h2 style="font-family:var(--font-display);font-size:1.8rem;margin-bottom:28px;text-align:center;">
+        You Might Also Like
+      </h2>
+      <div class="products-grid">
+        {% for product in related_products %}
+        {% include 'store/partials/product_card.html' %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .star-rating-input { display: flex; flex-direction: row-reverse; gap: 4px; }
+  .star-rating-input input { display: none; }
+  .star-rating-input label { font-size: 2rem; color: var(--border); cursor: pointer; transition: var(--transition); }
+  .star-rating-input input:checked ~ label,
+  .star-rating-input label:hover,
+  .star-rating-input label:hover ~ label { color: var(--gold); }
+  details summary::-webkit-details-marker { display: none; }
+  @media (max-width: 768px) { .reviews-layout { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}

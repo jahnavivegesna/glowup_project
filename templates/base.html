@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="GLOW UP - Luxury Skincare. Discover your most radiant skin." />
+  <title>{% block title %}{{ page_title|default:"GLOW UP - Luxury Skincare" }}{% endblock %}</title>
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=Satisfy&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Main CSS -->
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- ─── Page Loader ─────────────────────────────────────────── -->
+<div class="page-loader" id="pageLoader">
+  <div class="loader-brand">Glow Up</div>
+  <div class="loading-spinner" style="width:32px;height:32px;border-width:4px;"></div>
+</div>
+
+<!-- ─── Search Overlay ──────────────────────────────────────── -->
+<div class="search-overlay" id="searchOverlay">
+  <div class="search-box">
+    <form action="{% url 'search' %}" method="GET">
+      <div class="search-input-group">
+        <i class="fa fa-search" style="color:var(--gold);"></i>
+        <input
+          type="text"
+          name="q"
+          class="search-input"
+          placeholder="Search for serums, moisturizers, cleansers..."
+          autocomplete="off"
+        />
+        <button type="submit" class="btn-glow btn-primary-glow btn-sm">Search</button>
+      </div>
+    </form>
+    <p style="font-size:0.78rem;color:var(--text-muted);margin-top:12px;">
+      Press <kbd style="background:var(--cream-dark);padding:2px 6px;border-radius:4px;font-size:0.72rem;">/</kbd> to open, <kbd style="background:var(--cream-dark);padding:2px 6px;border-radius:4px;font-size:0.72rem;">Esc</kbd> to close
+    </p>
+    <button class="search-close" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-muted);">
+      <i class="fa fa-times"></i>
+    </button>
+  </div>
+</div>
+
+<!-- ─── Navbar ───────────────────────────────────────────────── -->
+<nav class="navbar" role="navigation" aria-label="Main navigation">
+  <!-- Brand -->
+  <a href="{% url 'home' %}" class="navbar-brand">
+    <div>
+      <span class="brand-logo">Glow Up</span>
+      <span class="brand-tagline">luxury skincare</span>
+    </div>
+  </a>
+
+  <!-- Desktop Menu -->
+  <ul class="navbar-menu" id="navMenu">
+    <li><a href="{% url 'home' %}" class="nav-link">Home</a></li>
+    <li><a href="{% url 'products' %}" class="nav-link">Products</a></li>
+    <li><a href="{% url 'about' %}" class="nav-link">About</a></li>
+    <li><a href="{% url 'contact' %}" class="nav-link">Contact</a></li>
+    {% if user.is_authenticated %}
+    <li><a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a></li>
+    {% endif %}
+  </ul>
+
+  <!-- Actions -->
+  <div class="navbar-actions">
+    <!-- Dark mode toggle -->
+    <button class="dark-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+      <div class="toggle-thumb">☀️</div>
+    </button>
+
+    <!-- Search -->
+    <button class="nav-icon-btn search-trigger" aria-label="Search" title="Search (/)">
+      <i class="fa fa-search"></i>
+    </button>
+
+    <!-- Wishlist -->
+    {% if user.is_authenticated %}
+    <a href="{% url 'wishlist' %}" class="nav-icon-btn" aria-label="Wishlist" title="My Wishlist">
+      <i class="fa fa-heart"></i>
+      {% if wishlist_count > 0 %}
+      <span class="badge-count wishlist-badge">{{ wishlist_count }}</span>
+      {% endif %}
+    </a>
+    {% endif %}
+
+    <!-- Cart -->
+    <a href="{% url 'cart' %}" class="nav-icon-btn" aria-label="Shopping Cart" title="My Cart">
+      <i class="fa fa-shopping-bag"></i>
+      {% if cart_count > 0 %}
+      <span class="badge-count cart-badge">{{ cart_count }}</span>
+      {% endif %}
+    </a>
+
+    <!-- Auth -->
+    {% if user.is_authenticated %}
+    <div style="position:relative;">
+      <a href="{% url 'dashboard' %}" class="nav-icon-btn" title="{{ user.get_full_name|default:user.username }}">
+        <i class="fa fa-user"></i>
+      </a>
+    </div>
+    <a href="{% url 'logout' %}" class="btn-glow btn-secondary-glow btn-sm" style="padding:8px 18px;">
+      Logout
+    </a>
+    {% else %}
+    <a href="{% url 'login' %}" class="btn-glow btn-secondary-glow btn-sm" style="padding:8px 18px;">
+      Login
+    </a>
+    <a href="{% url 'register' %}" class="btn-glow btn-primary-glow btn-sm" style="padding:8px 18px;">
+      Sign Up
+    </a>
+    {% endif %}
+
+    <!-- Hamburger -->
+    <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ─── Django Messages ──────────────────────────────────────── -->
+{% if messages %}
+<div style="position:fixed;top:80px;right:16px;z-index:5000;max-width:360px;width:100%;">
+  {% for message in messages %}
+  <div class="alert alert-{{ message.tags }} django-message" style="margin-bottom:8px;box-shadow:0 4px 20px var(--shadow);">
+    <i class="fa fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'danger' or message.tags == 'error' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+    {{ message }}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- ─── Main Content ─────────────────────────────────────────── -->
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<!-- ─── Footer ───────────────────────────────────────────────── -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-grid">
+    <!-- Brand column -->
+    <div class="footer-brand">
+      <span class="brand-logo">Glow Up</span>
+      <p class="footer-desc">
+        Your sanctuary for luxury skincare. We curate the finest formulations to help you achieve your most radiant, confident self.
+      </p>
+      <div class="social-links">
+        <a href="#" class="social-btn" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="#" class="social-btn" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" class="social-btn" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a>
+        <a href="#" class="social-btn" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+        <a href="#" class="social-btn" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div>
+      <h4 class="footer-heading">Quick Links</h4>
+      <ul class="footer-links">
+        <li><a href="{% url 'home' %}" class="footer-link">Home</a></li>
+        <li><a href="{% url 'products' %}" class="footer-link">All Products</a></li>
+        <li><a href="{% url 'about' %}" class="footer-link">About Us</a></li>
+        <li><a href="{% url 'contact' %}" class="footer-link">Contact</a></li>
+        {% if user.is_authenticated %}
+        <li><a href="{% url 'dashboard' %}" class="footer-link">My Dashboard</a></li>
+        {% else %}
+        <li><a href="{% url 'login' %}" class="footer-link">Login</a></li>
+        <li><a href="{% url 'register' %}" class="footer-link">Register</a></li>
+        {% endif %}
+      </ul>
+    </div>
+
+    <!-- Categories -->
+    <div>
+      <h4 class="footer-heading">Categories</h4>
+      <ul class="footer-links">
+        <li><a href="{% url 'products' %}?skin_type=oily" class="footer-link">Oily Skin</a></li>
+        <li><a href="{% url 'products' %}?skin_type=dry" class="footer-link">Dry Skin</a></li>
+        <li><a href="{% url 'products' %}?skin_type=sensitive" class="footer-link">Sensitive Skin</a></li>
+        <li><a href="{% url 'products' %}?skin_type=combination" class="footer-link">Combination Skin</a></li>
+        <li><a href="{% url 'products' %}?sort=newest" class="footer-link">New Arrivals</a></li>
+      </ul>
+    </div>
+
+    <!-- Support -->
+    <div>
+      <h4 class="footer-heading">Customer Care</h4>
+      <ul class="footer-links">
+        <li><a href="{% url 'contact' %}" class="footer-link">Help Center</a></li>
+        <li><a href="#" class="footer-link">Shipping Info</a></li>
+        <li><a href="#" class="footer-link">Returns & Exchange</a></li>
+        <li><a href="#" class="footer-link">Track Order</a></li>
+        <li><a href="#" class="footer-link">Privacy Policy</a></li>
+        <li><a href="#" class="footer-link">Terms of Service</a></li>
+      </ul>
+      <!-- Newsletter mini -->
+      <div style="margin-top:20px;">
+        <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-bottom:10px;">Get exclusive offers:</p>
+        <form action="{% url 'newsletter_subscribe' %}" method="POST" style="display:flex;gap:8px;">
+          {% csrf_token %}
+          <input type="email" name="email" placeholder="Your email" style="flex:1;padding:10px 14px;border-radius:50px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;font-size:0.8rem;outline:none;" />
+          <button type="submit" class="btn-glow btn-primary-glow btn-sm">Go</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2024 GLOW UP. All rights reserved. Made with 💛 for beautiful skin.</p>
+    <div style="display:flex;gap:16px;">
+      <a href="#" class="footer-link" style="font-size:0.8rem;">Privacy</a>
+      <a href="#" class="footer-link" style="font-size:0.8rem;">Terms</a>
+      <a href="#" class="footer-link" style="font-size:0.8rem;">Cookies</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ─── Scroll to Top ────────────────────────────────────────── -->
+<button class="scroll-top" id="scrollTop" aria-label="Scroll to top">
+  <i class="fa fa-chevron-up"></i>
+</button>
+
+<!-- ─── Toast Container ──────────────────────────────────────── -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ─── Scripts ──────────────────────────────────────────────── -->
+{% load static %}
+<script src="{% static 'js/main.js' %}" defer></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

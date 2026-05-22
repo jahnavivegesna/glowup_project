@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="dashboard-layout">
+
+  <!-- ─── Sidebar ─────────────────────────────────────── -->
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-profile">
+        <div class="sidebar-avatar">
+          {% if user.profile.avatar %}
+          <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_full_name }}" />
+          {% else %}
+          {{ user.first_name|first|upper|default:user.username|first|upper }}
+          {% endif %}
+        </div>
+        <h3 style="font-family:var(--font-display);font-size:1.1rem;color:var(--text-primary);margin-bottom:4px;">
+          {{ user.get_full_name|default:user.username }}
+        </h3>
+        <p style="font-size:0.78rem;color:var(--text-muted);">{{ user.email }}</p>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="{% url 'dashboard' %}" class="sidebar-link active">
+          <i class="fa fa-th-large"></i> Dashboard
+        </a>
+        <a href="{% url 'profile_update' %}" class="sidebar-link">
+          <i class="fa fa-user-edit"></i> Edit Profile
+        </a>
+        <a href="{% url 'order_history' %}" class="sidebar-link">
+          <i class="fa fa-shopping-bag"></i> My Orders
+        </a>
+        <a href="{% url 'wishlist' %}" class="sidebar-link">
+          <i class="fa fa-heart"></i> Wishlist
+          {% if wishlist_count > 0 %}
+          <span style="margin-left:auto;background:var(--gold);color:#fff;border-radius:50px;padding:2px 8px;font-size:0.7rem;">{{ wishlist_count }}</span>
+          {% endif %}
+        </a>
+        <a href="{% url 'coupons' %}" class="sidebar-link">
+          <i class="fa fa-tag"></i> My Coupons
+        </a>
+        <a href="{% url 'contact' %}" class="sidebar-link">
+          <i class="fa fa-headset"></i> Help &amp; Support
+        </a>
+        <a href="{% url 'logout' %}" class="sidebar-link" style="color:var(--danger);">
+          <i class="fa fa-sign-out-alt"></i> Logout
+        </a>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- ─── Main Content ─────────────────────────────────── -->
+  <main>
+    <!-- Welcome Banner -->
+    <div style="background:linear-gradient(135deg,var(--gold-light),var(--sage));border-radius:var(--card-radius);padding:28px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+      <div>
+        <span style="font-family:var(--font-accent);font-size:1rem;color:var(--green-dark);">Welcome back,</span>
+        <h2 style="font-family:var(--font-display);font-size:2rem;font-weight:400;color:var(--text-primary);margin-top:4px;">
+          {{ user.first_name|default:user.username }} ✨
+        </h2>
+        <p style="font-size:0.88rem;color:var(--text-secondary);margin-top:4px;">Your skin journey continues here</p>
+      </div>
+      <a href="{% url 'products' %}" class="btn-glow btn-primary-glow">
+        <i class="fa fa-shopping-bag"></i> Shop Now
+      </a>
+    </div>
+
+    <!-- Stats Row -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;">
+      <div style="background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);padding:20px;text-align:center;">
+        <div style="font-family:var(--font-display);font-size:2rem;font-weight:600;color:var(--gold);">{{ total_orders }}</div>
+        <div style="font-size:0.82rem;color:var(--text-muted);margin-top:4px;">Total Orders</div>
+      </div>
+      <div style="background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);padding:20px;text-align:center;">
+        <div style="font-family:var(--font-display);font-size:2rem;font-weight:600;color:var(--green);">{{ wishlist_count }}</div>
+        <div style="font-size:0.82rem;color:var(--text-muted);margin-top:4px;">Wishlist Items</div>
+      </div>
+      <div style="background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);padding:20px;text-align:center;">
+        <div style="font-family:var(--font-display);font-size:2rem;font-weight:600;color:var(--gold);">{{ coupons|length }}</div>
+        <div style="font-size:0.82rem;color:var(--text-muted);margin-top:4px;">Active Coupons</div>
+      </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div style="background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);padding:24px;margin-bottom:24px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h3 style="font-family:var(--font-display);font-size:1.3rem;">Recent Orders</h3>
+        <a href="{% url 'order_history' %}" style="font-size:0.82rem;color:var(--gold);">View All →</a>
+      </div>
+
+      {% if orders %}
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border);">
+              <th style="text-align:left;padding:8px 12px;font-weight:600;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;">Order ID</th>
+              <th style="text-align:left;padding:8px 12px;font-weight:600;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;">Date</th>
+              <th style="text-align:left;padding:8px 12px;font-weight:600;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;">Total</th>
+              <th style="text-align:left;padding:8px 12px;font-weight:600;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;">Status</th>
+              <th style="text-align:left;padding:8px 12px;font-weight:600;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in orders %}
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:12px;font-weight:500;">#{{ order.order_id }}</td>
+              <td style="padding:12px;color:var(--text-muted);">{{ order.created_at|date:"M d, Y" }}</td>
+              <td style="padding:12px;font-weight:500;">₹{{ order.total }}</td>
+              <td style="padding:12px;"><span class="order-status status-{{ order.status }}">{{ order.get_status_display }}</span></td>
+              <td style="padding:12px;">
+                <a href="{% url 'order_detail' order.order_id %}" style="color:var(--gold);font-size:0.82rem;">View Details →</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div style="text-align:center;padding:32px 0;color:var(--text-muted);">
+        <div style="font-size:2.5rem;margin-bottom:12px;">📦</div>
+        <p>No orders yet. <a href="{% url 'products' %}" style="color:var(--gold);">Start shopping!</a></p>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Active Coupons -->
+    {% if coupons %}
+    <div style="background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);padding:24px;margin-bottom:24px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h3 style="font-family:var(--font-display);font-size:1.3rem;">Active Coupons 🏷️</h3>
+        <a href="{% url 'coupons' %}" style="font-size:0.82rem;color:var(--gold);">View All →</a>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
+        {% for coupon in coupons %}
+        <div style="border:2px dashed var(--gold);border-radius:12px;padding:16px;background:var(--gold-light);">
+          <div style="font-family:var(--font-display);font-size:1.5rem;font-weight:600;color:var(--gold-dark);">
+            {% if coupon.discount_type == 'percent' %}{{ coupon.discount_value|floatformat:0 }}% OFF
+            {% else %}₹{{ coupon.discount_value }} OFF{% endif %}
+          </div>
+          <div style="font-weight:600;font-size:0.88rem;color:var(--text-primary);margin:6px 0;">{{ coupon.code }}</div>
+          <div style="font-size:0.72rem;color:var(--text-muted);">Valid till {{ coupon.valid_until|date:"M d, Y" }}</div>
+          <button onclick="navigator.clipboard.writeText('{{ coupon.code }}');this.textContent='Copied!';"
+                  style="margin-top:10px;font-size:0.72rem;padding:4px 10px;border-radius:50px;border:1px solid var(--gold-dark);background:transparent;color:var(--gold-dark);cursor:pointer;">
+            Copy Code
+          </button>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Offers Section -->
+    {% if offers %}
+    <div style="background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);padding:24px;margin-bottom:24px;">
+      <h3 style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:16px;">Current Offers 🎁</h3>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        {% for offer in offers %}
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--sage);border-radius:10px;flex-wrap:wrap;gap:8px;">
+          <div>
+            <div style="font-weight:500;font-size:0.9rem;color:var(--text-primary);">{{ offer.title }}</div>
+            <div style="font-size:0.78rem;color:var(--text-muted);">Valid till {{ offer.valid_until|date:"M d, Y" }}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="background:var(--green);color:#fff;padding:4px 10px;border-radius:50px;font-size:0.78rem;font-weight:600;">{{ offer.discount_percent }}% OFF</span>
+            <a href="{{ offer.url|default:'#' }}" class="btn-glow btn-sm btn-primary-glow">Shop Now</a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- New Arrivals -->
+    {% if new_arrivals %}
+    <div style="background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);padding:24px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h3 style="font-family:var(--font-display);font-size:1.3rem;">New Arrivals 🌟</h3>
+        <a href="{% url 'products' %}?sort=newest" style="font-size:0.82rem;color:var(--gold);">View All →</a>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;">
+        {% for product in new_arrivals %}
+        <a href="{% url 'product_detail' product.slug %}" style="display:block;">
+          <div style="border-radius:12px;overflow:hidden;background:var(--cream-dark);aspect-ratio:1;margin-bottom:8px;">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width:100%;height:100%;object-fit:cover;" />
+            {% else %}
+            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2rem;">🌿</div>
+            {% endif %}
+          </div>
+          <div style="font-size:0.82rem;font-weight:500;color:var(--text-primary);">{{ product.name|truncatechars:30 }}</div>
+          <div style="font-size:0.85rem;color:var(--gold);font-weight:600;">₹{{ product.price }}</div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </main>
+</div>
+{% endblock %}

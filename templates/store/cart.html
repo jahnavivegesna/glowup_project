@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-top" style="padding-bottom:80px;">
+  <div class="container">
+
+    <div style="padding:32px 0 24px;">
+      <h1 style="font-family:var(--font-display);font-size:2.5rem;font-weight:400;">
+        My Cart
+        {% if cart.total_items %}
+        <span style="font-size:1rem;color:var(--text-muted);font-weight:400;">({{ cart.total_items }} item{{ cart.total_items|pluralize }})</span>
+        {% endif %}
+      </h1>
+    </div>
+
+    {% if cart_items %}
+    <div style="display:grid;grid-template-columns:1fr 360px;gap:28px;align-items:start;">
+
+      <!-- ─── Cart Items ─────────────────────────────── -->
+      <div>
+        <div style="background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);padding:0 24px;">
+          {% for item in cart_items %}
+          <div class="cart-item" id="cart-item-{{ item.id }}">
+            <!-- Image -->
+            <a href="{% url 'product_detail' item.product.slug %}" class="cart-item-image">
+              {% if item.product.image %}
+              <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" />
+              {% else %}
+              <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--cream-dark);border-radius:12px;">
+                🌿
+              </div>
+              {% endif %}
+            </a>
+
+            <!-- Info -->
+            <div>
+              <div class="cart-item-brand">{{ item.product.brand }}</div>
+              <a href="{% url 'product_detail' item.product.slug %}">
+                <h3 class="cart-item-name">{{ item.product.name }}</h3>
+              </a>
+              {% if item.product.skin_type %}
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;">{{ item.product.get_skin_type_display }}</div>
+              {% endif %}
+
+              <!-- Quantity Control -->
+              <div class="qty-control"
+                   data-update-url="{% url 'update_cart' item.id %}"
+                   data-item-id="{{ item.id }}"
+                   data-max="{{ item.product.stock }}">
+                <button class="qty-btn qty-minus" type="button">−</button>
+                <input class="qty-value" type="number" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" />
+                <button class="qty-btn qty-plus" type="button">+</button>
+              </div>
+            </div>
+
+            <!-- Price & Remove -->
+            <div style="text-align:right;">
+              <div class="price-current" data-item-total="{{ item.id }}" style="font-size:1.2rem;margin-bottom:8px;">
+                ₹{{ item.total_price }}
+              </div>
+              {% if item.product.discount_price %}
+              <div style="font-size:0.78rem;color:var(--text-muted);text-decoration:line-through;">
+                ₹{{ item.product.original_price|floatformat:0 }} × {{ item.quantity }}
+              </div>
+              {% endif %}
+              <a href="{% url 'remove_from_cart' item.id %}"
+                 class="btn-icon"
+                 style="background:var(--blush);color:var(--danger);border:1px solid #f5c6cb;margin-top:10px;"
+                 title="Remove item"
+                 onclick="return confirm('Remove this item from cart?');">
+                <i class="fa fa-trash-alt"></i>
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Cart Actions -->
+        <div class="d-flex justify-between align-center" style="margin-top:16px;flex-wrap:wrap;gap:12px;">
+          <a href="{% url 'products' %}" class="btn-glow btn-secondary-glow btn-sm">
+            <i class="fa fa-arrow-left"></i> Continue Shopping
+          </a>
+          <a href="{% url 'clear_cart' %}" class="btn-glow btn-sm"
+             style="background:var(--blush);color:var(--danger);border:1px solid #f5c6cb;"
+             onclick="return confirm('Clear all items from your cart?');">
+            <i class="fa fa-trash"></i> Clear Cart
+          </a>
+        </div>
+      </div>
+
+      <!-- ─── Order Summary ──────────────────────────── -->
+      <div style="position:sticky;top:88px;">
+        <div style="background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);padding:28px;">
+          <h3 style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);">
+            Order Summary
+          </h3>
+
+          <!-- Coupon Code -->
+          <div style="margin-bottom:20px;">
+            <form id="coupon-form">
+              {% csrf_token %}
+              <div style="display:flex;gap:8px;">
+                <input type="text" id="coupon-input" class="form-control" placeholder="Enter coupon code" style="font-size:0.85rem;" />
+                <button type="submit" class="btn-glow btn-primary-glow btn-sm" style="white-space:nowrap;">Apply</button>
+              </div>
+              <div id="coupon-message" style="font-size:0.78rem;margin-top:6px;"></div>
+            </form>
+          </div>
+
+          <!-- Totals -->
+          <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;">
+            <div style="display:flex;justify-content:space-between;font-size:0.88rem;color:var(--text-secondary);">
+              <span>Subtotal ({{ cart.total_items }} items)</span>
+              <span class="cart-subtotal">₹{{ cart.subtotal }}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:0.88rem;color:var(--text-secondary);">
+              <span>Shipping</span>
+              <span style="color:{% if shipping_charge == 0 %}var(--green){% else %}var(--text-primary){% endif %};">
+                {% if shipping_charge == 0 %}FREE{% else %}₹{{ shipping_charge }}{% endif %}
+              </span>
+            </div>
+            <div id="discount-row" style="display:none;justify-content:space-between;font-size:0.88rem;color:var(--green);">
+              <span>Coupon Discount</span>
+              <span id="discount-amount"></span>
+            </div>
+            {% if cart.subtotal < 499 %}
+            <div style="font-size:0.78rem;color:var(--gold);background:var(--gold-light);padding:8px 12px;border-radius:8px;">
+              🛒 Add ₹{{ 499|add:"-"|add:cart.subtotal }} more for free shipping!
+            </div>
+            {% endif %}
+          </div>
+
+          <div style="border-top:1px solid var(--border);padding-top:16px;margin-bottom:20px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-family:var(--font-display);font-size:1.1rem;font-weight:500;">Total</span>
+              <span id="order-total" class="price-current" style="font-size:1.6rem;"
+                    data-subtotal="{{ cart.subtotal }}"
+                    data-shipping="{{ shipping_charge }}">
+                ₹{{ total }}
+              </span>
+            </div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;text-align:right;">
+              Inclusive of all taxes
+            </div>
+          </div>
+
+          <a href="{% url 'checkout' %}" class="btn-glow btn-primary-glow btn-lg" style="width:100%;justify-content:center;">
+            <i class="fa fa-lock"></i> Proceed to Checkout
+          </a>
+
+          <!-- Payment badges -->
+          <div style="margin-top:16px;text-align:center;">
+            <p style="font-size:0.72rem;color:var(--text-muted);margin-bottom:8px;">Accepted Payment</p>
+            <div style="display:flex;justify-content:center;align-items:center;gap:8px;">
+              <span style="background:var(--cream-dark);padding:4px 10px;border-radius:6px;font-size:0.72rem;border:1px solid var(--border);">Cash on Delivery</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trust Badges -->
+        <div style="margin-top:16px;background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);padding:20px;">
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;color:var(--text-secondary);">
+              <i class="fa fa-shield-alt" style="color:var(--green);width:20px;text-align:center;"></i>
+              Secure & encrypted transactions
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;color:var(--text-secondary);">
+              <i class="fa fa-undo" style="color:var(--gold);width:20px;text-align:center;"></i>
+              Easy 30-day returns
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;color:var(--text-secondary);">
+              <i class="fa fa-truck" style="color:var(--gold);width:20px;text-align:center;"></i>
+              Fast delivery across India
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% else %}
+    <!-- Empty Cart -->
+    <div style="text-align:center;padding:80px 20px;background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);max-width:500px;margin:0 auto;">
+      <div style="font-size:5rem;margin-bottom:20px;">🛒</div>
+      <h2 style="font-family:var(--font-display);font-size:2rem;margin-bottom:12px;">Your Cart is Empty</h2>
+      <p style="color:var(--text-muted);margin-bottom:28px;">Looks like you haven't added any products yet. Explore our skincare collection!</p>
+      <a href="{% url 'products' %}" class="btn-glow btn-primary-glow btn-lg">
+        <i class="fa fa-shopping-bag"></i> Start Shopping
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Show discount row when coupon is applied
+const discountRow = document.getElementById('discount-row');
+const observer = new MutationObserver(() => {
+  const amt = document.getElementById('discount-amount');
+  if (amt && amt.textContent) {
+    if (discountRow) discountRow.style.display = 'flex';
+  }
+});
+const discountEl = document.getElementById('discount-amount');
+if (discountEl) observer.observe(discountEl, { childList: true, subtree: true });
+</script>
+{% endblock %}

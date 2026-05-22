@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="dashboard-layout">
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-profile">
+        <div class="sidebar-avatar">{{ user.first_name|first|upper|default:user.username|first|upper }}</div>
+        <h3 style="font-family:var(--font-display);font-size:1.1rem;color:var(--text-primary);">{{ user.get_full_name|default:user.username }}</h3>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="{% url 'dashboard' %}" class="sidebar-link"><i class="fa fa-th-large"></i> Dashboard</a>
+        <a href="{% url 'profile_update' %}" class="sidebar-link"><i class="fa fa-user-edit"></i> Edit Profile</a>
+        <a href="{% url 'order_history' %}" class="sidebar-link active"><i class="fa fa-shopping-bag"></i> My Orders</a>
+        <a href="{% url 'wishlist' %}" class="sidebar-link"><i class="fa fa-heart"></i> Wishlist</a>
+        <a href="{% url 'coupons' %}" class="sidebar-link"><i class="fa fa-tag"></i> My Coupons</a>
+        <a href="{% url 'logout' %}" class="sidebar-link" style="color:var(--danger);"><i class="fa fa-sign-out-alt"></i> Logout</a>
+      </nav>
+    </div>
+  </aside>
+  <main>
+    <div style="margin-bottom:16px;"><a href="{% url 'order_history' %}" style="color:var(--gold);font-size:0.85rem;"><i class="fa fa-arrow-left"></i> Back to Orders</a></div>
+    <div style="background:var(--card-bg);border-radius:var(--card-radius);border:1px solid var(--border);overflow:hidden;">
+      <!-- Header -->
+      <div style="padding:24px 28px;background:var(--cream-dark);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Order</div>
+          <h2 style="font-family:var(--font-display);font-size:1.6rem;">#{{ order.order_id }}</h2>
+          <div style="font-size:0.82rem;color:var(--text-muted);">Placed on {{ order.created_at|date:"F d, Y at g:i A" }}</div>
+        </div>
+        <span class="order-status status-{{ order.status }}" style="font-size:0.9rem;padding:6px 18px;">{{ order.get_status_display }}</span>
+      </div>
+      <!-- Body -->
+      <div style="padding:28px;display:grid;grid-template-columns:1fr 320px;gap:28px;">
+        <div>
+          <h3 style="font-family:var(--font-display);font-size:1.2rem;margin-bottom:16px;">Items Ordered</h3>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px;">
+            {% for item in order.items.all %}
+            <div style="display:flex;gap:16px;padding:16px;background:var(--cream-dark);border-radius:12px;align-items:center;">
+              <div style="width:64px;height:64px;border-radius:10px;overflow:hidden;flex-shrink:0;background:var(--border);">
+                {% if item.product.image %}<img src="{{ item.product.image.url }}" style="width:100%;height:100%;object-fit:cover;">{% else %}<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:1.5rem;">🌿</div>{% endif %}
+              </div>
+              <div style="flex:1;">
+                <div style="font-weight:500;font-size:0.92rem;">{{ item.product_name }}</div>
+                <div style="font-size:0.78rem;color:var(--text-muted);">₹{{ item.product_price }} × {{ item.quantity }}</div>
+              </div>
+              <div style="font-weight:600;font-size:1rem;">₹{{ item.total_price }}</div>
+            </div>
+            {% endfor %}
+          </div>
+          <!-- Shipping Address -->
+          <h3 style="font-family:var(--font-display);font-size:1.2rem;margin-bottom:12px;">Delivery Address</h3>
+          <div style="padding:16px;background:var(--sage);border-radius:12px;font-size:0.88rem;color:var(--text-secondary);line-height:1.8;">
+            <strong style="color:var(--text-primary);">{{ order.full_name }}</strong><br>
+            {{ order.address_line1 }}{% if order.address_line2 %}, {{ order.address_line2 }}{% endif %}<br>
+            {{ order.city }}, {{ order.state }} - {{ order.pincode }}<br>
+            📞 {{ order.phone }} &nbsp; ✉️ {{ order.email }}
+          </div>
+        </div>
+        <!-- Summary -->
+        <div>
+          <div style="background:var(--cream-dark);border-radius:var(--card-radius);padding:20px;">
+            <h3 style="font-family:var(--font-display);font-size:1.2rem;margin-bottom:16px;">Payment Summary</h3>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;justify-content:space-between;font-size:0.88rem;color:var(--text-secondary);"><span>Subtotal</span><span>₹{{ order.subtotal }}</span></div>
+              {% if order.discount_amount > 0 %}<div style="display:flex;justify-content:space-between;font-size:0.88rem;color:var(--green);"><span>Discount</span><span>-₹{{ order.discount_amount }}</span></div>{% endif %}
+              <div style="display:flex;justify-content:space-between;font-size:0.88rem;color:var(--text-secondary);"><span>Shipping</span><span>{% if order.shipping_charge == 0 %}FREE{% else %}₹{{ order.shipping_charge }}{% endif %}</span></div>
+              <div style="display:flex;justify-content:space-between;font-family:var(--font-display);font-size:1.3rem;font-weight:600;padding-top:12px;border-top:1px solid var(--border);"><span>Total</span><span style="color:var(--gold);">₹{{ order.total }}</span></div>
+            </div>
+            <div style="margin-top:16px;padding:12px;background:var(--gold-light);border-radius:8px;font-size:0.82rem;color:var(--gold-dark);text-align:center;">
+              💵 {{ order.get_payment_method_display }}
+            </div>
+          </div>
+          {% if order.coupon %}<div style="margin-top:12px;padding:12px;background:var(--sage);border-radius:10px;font-size:0.82rem;color:var(--green-dark);"><i class="fa fa-tag"></i> Coupon "{{ order.coupon.code }}" was applied</div>{% endif %}
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
