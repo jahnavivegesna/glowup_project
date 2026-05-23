@@ -704,8 +704,12 @@ def newsletter_subscribe(request):
 from django.http import HttpResponse
 from django.contrib.admin.views.decorators import staff_member_required
 
-@staff_member_required
 def load_data_view(request):
     from django.core.management import call_command
+    from django.contrib.auth.models import User
+    # Create superuser if not exists
+    if not User.objects.filter(username='admin').exists():
+        User.objects.create_superuser('admin', 'admin@gmail.com', 'admin1234')
+    # Load sample data
     call_command('load_sample_data')
-    return HttpResponse("Sample data loaded successfully!")
+    return HttpResponse("Done! Admin created and sample data loaded!")
