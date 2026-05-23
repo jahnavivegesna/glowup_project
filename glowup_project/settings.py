@@ -68,17 +68,35 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'glowup_project.wsgi.application'
 
-# ─── Database ──────────────────────────────────────────────────────────────────
 import dj_database_url
 import os
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
-        conn_max_age=600
-    )
-}
+DATABASE_URL = os.environ.get('DATABASE_URL')
 
+if DATABASE_URL:
+    # Render PostgreSQL database
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600
+        )
+    }
+else:
+    # Local MySQL database
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'glowup_db',
+            'USER': 'root',
+            'PASSWORD': 'janu@.16',
+            'HOST': 'localhost',
+            'PORT': '3306',
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            },
+        }
+    }
 # ─── Password Validation ────────────────────────────────────────────────────────
 AUTH_PASSWORD_VALIDATORS = []
 
